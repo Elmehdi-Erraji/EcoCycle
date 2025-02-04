@@ -1,0 +1,81 @@
+<!-- Header -->
+<!-- Header -->
+<header class="fixed w-full bg-white shadow-md z-50">
+  <div class="container mx-auto px-4 py-3 flex items-center justify-between">
+    <div class="flex items-center">
+      <img src="assets/logo.svg" alt="RecycleHub Logo" class="h-8 w-auto">
+      <span class="ml-2 text-xl font-semibold text-green-600">RecycleHub</span>
+    </div>
+
+    <!-- Navigation for larger screens -->
+    <nav class="hidden md:flex space-x-6">
+      <a href="#" class="text-gray-600 hover:text-green-500 transition-colors">Home</a>
+      <a href="#" class="text-gray-600 hover:text-green-500 transition-colors">How It Works</a>
+      <a href="#" class="text-gray-600 hover:text-green-500 transition-colors">Features</a>
+      <a href="#" class="text-gray-600 hover:text-green-500 transition-colors">About</a>
+      <a href="#" class="text-gray-600 hover:text-green-500 transition-colors">Contact</a>
+    </nav>
+
+    <!-- Button for login/register (visible on larger screens) -->
+    <button class="hidden md:block bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-4 rounded-full transition-colors" (click)="openLoginModal()">
+      Login / Register
+    </button>
+
+    <!-- Mobile menu button (visible on small screens) -->
+    <button (click)="toggleMobileMenu()" class="md:hidden">
+      <i class="fas fa-bars text-gray-600"></i>
+    </button>
+  </div>
+
+  <!-- Mobile menu -->
+  <div *ngIf="isMobileMenuOpen" class="md:hidden bg-white py-4">
+    <div class="flex justify-between items-center px-4">
+      <img src="assets/logo.svg" alt="RecycleHub Logo" class="h-8 w-auto">
+      <button (click)="toggleMobileMenu()" class="text-gray-600">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-green-500 hover:text-white">Home</a>
+    <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-green-500 hover:text-white">How It Works</a>
+    <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-green-500 hover:text-white">Features</a>
+    <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-green-500 hover:text-white">About</a>
+    <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-green-500 hover:text-white">Contact</a>
+    <a href="#" class="block px-4 py-2 bg-green-500 text-white font-semibold">Login / Register</a>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="bg-gradient-to-r from-green-400 to-blue-500 text-white py-32 md:py-40">
+  <div class="container mx-auto px-4 text-center">
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold mb-4">RecycleHub – Connect, Recycle, Reward</h1>
+    <p class="text-xl mb-8 max-w-2xl mx-auto">Empowering communities through sustainable recycling.</p>
+    <button class="bg-white text-green-500 hover:bg-green-100 font-semibold py-3 px-8 rounded-full text-lg transition-colors transform hover:scale-105">
+      Get Started
+    </button>
+  </div>
+</section>
+
+<!-- Features Section -->
+<section class="py-16 bg-gray-100">
+  <div class="container mx-auto px-4">
+    <h2 class="text-3xl font-bold text-center mb-12">How It Works</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div class="bg-white p-6 rounded-lg shadow-lg" *ngFor="let feature of features">
+        <div class="text-green-500 mb-4">
+          <i class="fas" [ngClass]="feature.iconClass"></i>
+        </div>
+        <h3 class="text-xl font-semibold mb-2">{{ feature.title }}</h3>
+        <p class="text-gray-600">{{ feature.description }}</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Modal for Login/Register (Hidden initially) -->
+<div *ngIf="isLoginModalOpen" class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+  <div class="bg-white p-6 rounded-lg shadow-lg">
+    <h2 class="text-xl font-semibold mb-4">Login / Register</h2>
+    <!-- Add form fields for login/register -->
+    <button (click)="closeLoginModal()" class="mt-4 bg-green-500 text-white px-4 py-2 rounded-full">Close</button>
+  </div>
+</div>
