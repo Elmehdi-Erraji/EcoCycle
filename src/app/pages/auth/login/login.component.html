@@ -1,31 +1,77 @@
-<div class="container mt-4">
-    <h2>Login</h2>
-    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-        <div class="mb-3">
-            <label class="form-label">Email:</label>
-            <input
-                    type="email"
-                    formControlName="email"
-                    class="form-control"
-                    placeholder="Enter your email"
-                    required
-            />
+<!-- src/app/login/login.component.html -->
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-green-400">
+    <div class="flex flex-wrap w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+
+        <!-- Image Section (choose an environmental image) -->
+        <div class="hidden md:block w-1/2 bg-cover bg-center" style="background-image: url('assets/images/green.jpg')">
+            <!-- Replace with your desired eco-friendly image path -->
         </div>
-        <div class="mb-3">
-            <label class="form-label">Password:</label>
-            <input
-                    type="password"
-                    formControlName="password"
-                    class="form-control"
-                    placeholder="Enter your password"
-                    required
-            />
+
+        <!-- Form Section -->
+        <div class="w-full md:w-1/2 p-8">
+            <h2 class="text-3xl font-bold mb-6 text-center text-green-800">Login</h2>
+
+            <!-- Error Alert -->
+            <div *ngIf="error$ | async as errorMsg" class="bg-red-500 text-white text-center py-2 mb-4 rounded">
+                {{ errorMsg }}
+            </div>
+
+            <!-- Login Form -->
+            <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+                <!-- Email Field -->
+                <div class="mb-4">
+                    <label class="block text-green-700 text-sm font-bold mb-2">Email</label>
+                    <input
+                            type="email"
+                            formControlName="email"
+                            placeholder="Enter your email"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                    <p *ngIf="loginForm.get('email')?.invalid && loginForm.get('email')?.touched"
+                       class="text-red-500 text-xs italic">
+                        Please enter a valid email.
+                    </p>
+                </div>
+
+                <!-- Password Field -->
+                <div class="mb-4">
+                    <label class="block text-green-700 text-sm font-bold mb-2">Password</label>
+                    <input
+                            type="password"
+                            formControlName="password"
+                            placeholder="Enter your password"
+                            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 leading-tight focus:outline-none focus:shadow-outline"
+                    />
+                    <p *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+                       class="text-red-500 text-xs italic">
+                        Password is required.
+                    </p>
+                </div>
+
+                <!-- Submit & Register Buttons -->
+                <div class="flex items-center justify-between mb-4">
+                    <button
+                            type="submit"
+                            [disabled]="loginForm.invalid"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                    >
+                        Login
+                    </button>
+                    <button type="button"
+                            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                        <a href="/register">Create an account</a>
+                    </button>
+                </div>
+
+                <!-- Google Sign-In Button -->
+                <div class="flex justify-center mb-4">
+                    <button type="button"
+                            class="bg-white border rounded-lg py-2 px-4 flex items-center space-x-2 shadow-md hover:bg-green-50">
+                        <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google" class="w-5 h-5">
+                        <span class="text-green-700">Sign in with Google</span>
+                    </button>
+                </div>
+            </form>
         </div>
-        <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">
-            Login
-        </button>
-    </form>
-    <div *ngIf="error$ | async as errorMsg" class="alert alert-danger mt-3">
-        {{ errorMsg }}
     </div>
 </div>

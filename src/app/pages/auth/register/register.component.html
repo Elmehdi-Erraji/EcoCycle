@@ -1,84 +1,170 @@
-<div class="container mt-4">
-  <h2>Register</h2>
-  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
-    <div class="mb-3">
-      <label class="form-label">First Name:</label>
-      <input
-        type="text"
-        formControlName="firstName"
-        class="form-control"
-        placeholder="First Name"
-        required
-      />
+<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-100 to-green-400 p-4">
+  <div class="flex flex-wrap w-full max-w-4xl bg-white shadow-lg rounded-lg overflow-hidden">
+
+    <!-- Image Section (visible on md and above) -->
+    <div class="hidden md:block md:w-1/3 bg-cover bg-center" style="background-image: url('assets/images/recycle.png')">
+      <!-- The image will display on medium screens and above -->
     </div>
-    <div class="mb-3">
-      <label class="form-label">Last Name:</label>
-      <input
-        type="text"
-        formControlName="lastName"
-        class="form-control"
-        placeholder="Last Name"
-        required
-      />
+
+    <!-- Form Section -->
+    <div class="w-full md:w-2/3 p-8">
+      <h2 class="text-3xl font-bold mb-4 text-center text-green-800">Register</h2>
+
+      <!-- Error Alert -->
+      <div *ngIf="errorMsg" class="bg-red-500 text-white text-center py-2 mb-4 rounded">
+        {{ errorMsg }}
+      </div>
+
+      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+
+        <!-- First Name Field -->
+        <div class="mb-4">
+          <label for="firstName" class="block text-green-700 text-sm font-bold mb-1">First Name</label>
+          <input
+            id="firstName"
+            type="text"
+            formControlName="firstName"
+            placeholder="First Name"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('firstName')?.invalid && registerForm.get('firstName')?.touched"
+             class="text-red-500 text-xs italic">
+            First name is required.
+          </p>
+        </div>
+
+        <!-- Last Name Field -->
+        <div class="mb-4">
+          <label for="lastName" class="block text-green-700 text-sm font-bold mb-1">Last Name</label>
+          <input
+            id="lastName"
+            type="text"
+            formControlName="lastName"
+            placeholder="Last Name"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('lastName')?.invalid && registerForm.get('lastName')?.touched"
+             class="text-red-500 text-xs italic">
+            Last name is required.
+          </p>
+        </div>
+
+        <!-- Email Field -->
+        <div class="mb-4">
+          <label for="email" class="block text-green-700 text-sm font-bold mb-1">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            placeholder="Email"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+             class="text-red-500 text-xs italic">
+            A valid email is required.
+          </p>
+        </div>
+
+        <!-- Password Field -->
+        <div class="mb-4">
+          <label for="password" class="block text-green-700 text-sm font-bold mb-1">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            placeholder="Password"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+             class="text-red-500 text-xs italic">
+            Password is required.
+          </p>
+        </div>
+
+        <!-- Address Field -->
+        <div class="mb-4">
+          <label for="address" class="block text-green-700 text-sm font-bold mb-1">Address</label>
+          <input
+            id="address"
+            type="text"
+            formControlName="address"
+            placeholder="Address"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('address')?.invalid && registerForm.get('address')?.touched"
+             class="text-red-500 text-xs italic">
+            Address is required.
+          </p>
+        </div>
+
+        <!-- Phone Number Field -->
+        <div class="mb-4">
+          <label for="phone" class="block text-green-700 text-sm font-bold mb-1">Phone Number</label>
+          <input
+            id="phone"
+            type="text"
+            formControlName="phone"
+            placeholder="Phone Number"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('phone')?.invalid && registerForm.get('phone')?.touched"
+             class="text-red-500 text-xs italic">
+            Phone number is required.
+          </p>
+        </div>
+
+        <!-- Date of Birth Field -->
+        <div class="mb-4">
+          <label for="dateOfBirth" class="block text-green-700 text-sm font-bold mb-1">Date of Birth</label>
+          <input
+            id="dateOfBirth"
+            type="date"
+            formControlName="dateOfBirth"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+          <p *ngIf="registerForm.get('dateOfBirth')?.errors?.['required'] && registerForm.get('dateOfBirth')?.touched"
+             class="text-red-500 text-xs italic">
+            Date of birth is required.
+          </p>
+          <p *ngIf="registerForm.get('dateOfBirth')?.errors?.['ageInvalid'] && registerForm.get('dateOfBirth')?.touched"
+             class="text-red-500 text-xs italic">
+            You must be at least 18 years old.
+          </p>
+        </div>
+
+        <!-- Profile Picture Field (Optional) -->
+        <div class="mb-4">
+          <label for="profilePicture" class="block text-green-700 text-sm font-bold mb-1">
+            Profile Picture URL (optional)
+          </label>
+          <input
+            id="profilePicture"
+            type="text"
+            formControlName="profilePicture"
+            placeholder="Profile Picture URL"
+            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
+          />
+        </div>
+
+        <!-- Submit Button (Always clickable) -->
+        <div class="flex items-center justify-center">
+          <button
+            type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+          >
+            Register
+          </button>
+
+        </div>
+      </form>
+
+      <!-- Login Redirect Link (Clickable) -->
+      <div class="text-center mt-4">
+        <a routerLink="/login" class="text-green-600 hover:text-green-700 font-bold cursor-pointer">
+          Already have an account? Login
+        </a>
+      </div>
+
     </div>
-    <div class="mb-3">
-      <label class="form-label">Email:</label>
-      <input
-        type="email"
-        formControlName="email"
-        class="form-control"
-        placeholder="Email"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Password:</label>
-      <input
-        type="password"
-        formControlName="password"
-        class="form-control"
-        placeholder="Password"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Address:</label>
-      <input
-        type="text"
-        formControlName="address"
-        class="form-control"
-        placeholder="Address"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Phone Number:</label>
-      <input
-        type="text"
-        formControlName="phone"
-        class="form-control"
-        placeholder="Phone Number"
-        required
-      />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Date of Birth:</label>
-      <input type="date" formControlName="dateOfBirth" class="form-control" required />
-    </div>
-    <div class="mb-3">
-      <label class="form-label">Profile Picture URL (optional):</label>
-      <input
-        type="text"
-        formControlName="profilePicture"
-        class="form-control"
-        placeholder="Profile Picture URL"
-      />
-    </div>
-    <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
-      Register
-    </button>
-  </form>
-  <div *ngIf="errorMsg" class="alert alert-danger mt-3">
-    {{ errorMsg }}
   </div>
 </div>
