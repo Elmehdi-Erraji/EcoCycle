@@ -1,18 +1,8 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-
-export interface User {
-  email: string;
-  password: string;
-  firstName: string;
-  lastName: string;
-  address: string;
-  phone: string;
-  dateOfBirth: string; // Format: YYYY-MM-DD
-  profilePicture?: string;
-  role?: string;
-}
+// Import the dedicated User model
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -46,8 +36,14 @@ export class AuthService {
   register(user: User): boolean {
     const users: User[] = JSON.parse(localStorage.getItem('users') || '[]');
 
+    // Check if the user already exists
     if (users.find(u => u.email === user.email)) {
-      return false; // User already exists.
+      return false;
+    }
+
+    // Optionally, initialize the score for a particulier if not already provided
+    if (user.role === 'particulier' && (user.score === undefined || user.score === null)) {
+      user.score = 0;
     }
 
     users.push(user);
@@ -95,6 +91,9 @@ export class AuthService {
     return localStorage.getItem('currentUser') != null;
   }
 
+  /**
+   * Returns the current user.
+   */
   getCurrentUser(): User | null {
     const userData = localStorage.getItem('currentUser');
     if (userData) {

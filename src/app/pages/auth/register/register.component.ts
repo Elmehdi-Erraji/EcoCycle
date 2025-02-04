@@ -2,7 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import {AuthService, User} from '../../../core/services/auth-service.service';
+import { AuthService } from '../../../core/services/auth-service.service';
+import { User } from '../../../core/models/user.model'; // Import the dedicated User model
 
 @Component({
   selector: 'app-register',
@@ -38,9 +39,12 @@ export class RegisterComponent implements OnInit {
       const newUser: User = this.registerForm.value;
       // Set the role for a 'particulier'
       newUser.role = 'particulier';
+      // Optionally, you can initialize the score here:
+      newUser.score = 0;
+
       if (this.authService.register(newUser)) {
-        // Navigate to home (or another page) on successful registration
-        this.router.navigate(['/home']);
+        // Navigate to login on successful registration
+        this.router.navigate(['/login']);
       } else {
         this.errorMsg = 'A user with this email already exists.';
       }
