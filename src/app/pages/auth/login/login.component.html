@@ -1,0 +1,31 @@
+<div class="container mt-4">
+  <h2>Login</h2>
+  <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label class="form-label">Email:</label>
+      <input
+        type="email"
+        formControlName="email"
+        class="form-control"
+        placeholder="Enter your email"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Password:</label>
+      <input
+        type="password"
+        formControlName="password"
+        class="form-control"
+        placeholder="Enter your password"
+        required
+      />
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="loginForm.invalid">
+      Login
+    </button>
+  </form>
+  <div *ngIf="errorMsg" class="alert alert-danger mt-3">
+    {{ errorMsg }}
+  </div>
+</div>

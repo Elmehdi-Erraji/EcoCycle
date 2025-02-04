@@ -1,0 +1,52 @@
+[
+  {
+    "email": "collector1@example.com",
+    "password": "password123",
+    "firstName": "Alice",
+    "lastName": "Dupont",
+    "address": "123 Rue de Paris, Paris",
+    "phone": "0102030405",
+    "dateOfBirth": "1985-05-15",
+    "role": "collector"
+  },
+  {
+    "email": "collector2@example.com",
+    "password": "password123",
+    "firstName": "Bob",
+    "lastName": "Martin",
+    "address": "456 Avenue de Lyon, Lyon",
+    "phone": "0203040506",
+    "dateOfBirth": "1990-08-22",
+    "role": "collector"
+  },
+  {
+    "email": "collector3@example.com",
+    "password": "password123",
+    "firstName": "Claire",
+    "lastName": "Lefevre",
+    "address": "789 Boulevard de Marseille, Marseille",
+    "phone": "0304050607",
+    "dateOfBirth": "1988-12-05",
+    "role": "collector"
+  },
+  {
+    "email": "collector4@example.com",
+    "password": "password123",
+    "firstName": "David",
+    "lastName": "Bernard",
+    "address": "101 Route de Bordeaux, Bordeaux",
+    "phone": "0405060708",
+    "dateOfBirth": "1983-11-10",
+    "role": "collector"
+  },
+  {
+    "email": "collector5@example.com",
+    "password": "password123",
+    "firstName": "Eva",
+    "lastName": "Petit",
+    "address": "202 Chemin de Nice, Nice",
+    "phone": "0506070809",
+    "dateOfBirth": "1995-03-30",
+    "role": "collector"
+  }
+]

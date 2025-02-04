@@ -1,0 +1,84 @@
+<div class="container mt-4">
+  <h2>Register</h2>
+  <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+    <div class="mb-3">
+      <label class="form-label">First Name:</label>
+      <input
+        type="text"
+        formControlName="firstName"
+        class="form-control"
+        placeholder="First Name"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Last Name:</label>
+      <input
+        type="text"
+        formControlName="lastName"
+        class="form-control"
+        placeholder="Last Name"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Email:</label>
+      <input
+        type="email"
+        formControlName="email"
+        class="form-control"
+        placeholder="Email"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Password:</label>
+      <input
+        type="password"
+        formControlName="password"
+        class="form-control"
+        placeholder="Password"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Address:</label>
+      <input
+        type="text"
+        formControlName="address"
+        class="form-control"
+        placeholder="Address"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Phone Number:</label>
+      <input
+        type="text"
+        formControlName="phone"
+        class="form-control"
+        placeholder="Phone Number"
+        required
+      />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Date of Birth:</label>
+      <input type="date" formControlName="dateOfBirth" class="form-control" required />
+    </div>
+    <div class="mb-3">
+      <label class="form-label">Profile Picture URL (optional):</label>
+      <input
+        type="text"
+        formControlName="profilePicture"
+        class="form-control"
+        placeholder="Profile Picture URL"
+      />
+    </div>
+    <button type="submit" class="btn btn-primary" [disabled]="registerForm.invalid">
+      Register
+    </button>
+  </form>
+  <div *ngIf="errorMsg" class="alert alert-danger mt-3">
+    {{ errorMsg }}
+  </div>
+</div>
