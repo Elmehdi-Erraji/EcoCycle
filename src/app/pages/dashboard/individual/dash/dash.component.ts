@@ -1,20 +1,9 @@
-
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterOutlet } from '@angular/router';
-
-interface Request {
-  id: number;
-  type: string;
-  photos?: string;
-  weight: number; // in grams
-  address: string;
-  date: string; // e.g., 2025-03-15
-  timeSlot: string; // e.g., "09:00-12:00"
-  notes?: string;
-  status: string; // "En attente", etc.
-}
+import { RequestService } from '../../../../core/services/request.service';
+import { AuthService } from '../../../../core/services/auth-service.service';
+import { Request } from '../../../../core/models/request.model';
 
 @Component({
   selector: 'app-dash',
@@ -23,97 +12,163 @@ interface Request {
   templateUrl: './dash.component.html',
   styleUrls: ['./dash.component.css']
 })
-export class DashComponent {
-  // Dummy summary values
-  totalRequests = 5;
-  myScore = 82;
+export class DashComponent implements OnInit {
+  totalRequests = 0;
+  myScore = 0;
+  userId: string = '';
 
-  // Dummy request data
-  requests: Request[] = [
-    {
-      id: 1,
-      type: 'Plastique, Papier',
-      weight: 1500,
-      address: '123 Rue de la Recyclage, Paris',
-      date: '2025-03-15',
-      timeSlot: '09:00-12:00',
-      notes: 'Please pick up carefully',
-      status: 'En attente'
-    },
-    {
-      id: 2,
-      type: 'Verre',
-      weight: 2000,
-      address: '456 Avenue Verte, Lyon',
-      date: '2025-03-16',
-      timeSlot: '14:00-17:00',
-      notes: '',
-      status: 'En attente'
-    },
-    {
-      id: 3,
-      type: 'Métal',
-      weight: 1200,
-      address: '789 Boulevard Écolo, Marseille',
-      date: '2025-03-17',
-      timeSlot: '10:00-13:00',
-      notes: 'Call before arrival',
-      status: 'En attente'
-    }
-  ];
-
-  // For filtering & search
-  searchText: string = '';
-  filterDate: string = '';
-
-  // Modal control booleans
+  // Requests
+  requests: Request[] = [];
+  searchText = '';
   isAddModalOpen = false;
   isEditModalOpen = false;
   isShowModalOpen = false;
   currentRequest: Request | null = null;
 
-  // Open the Add Request modal
-  openAddModal() {
-    this.isAddModalOpen = true;
-  }
-  closeAddModal() {
-    this.isAddModalOpen = false;
+  // Available waste types
+  wasteTypes: string[] = ['plastique', 'verre', 'papier', 'métal'];
+
+  newRequest: Partial<Request> = {
+    type: '',
+    weight: 1000,
+    address: '',
+    date: '',
+    timeSlot: '',
+    notes: ''
+  };
+
+  formErrors = {
+    type: false,
+    weight: false,
+    address: false,
+    date: false,
+    timeSlot: false
+  };
+
+  constructor(
+    private requestService: RequestService,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const currentUser = this.authService.getCurrentUser();
+    if (currentUser) {
+      this.userId = currentUser.email; // Using email as a unique ID
+      this.loadRequests();
+      this.calculateScore();
+    }
   }
 
-  // Open the Edit modal (dummy)
-  openEditModal(req: Request) {
-    this.currentRequest = req;
-    this.isEditModalOpen = true;
-  }
-  closeEditModal() {
-    this.isEditModalOpen = false;
-    this.currentRequest = null;
-  }
-
-  // Open the Show Details modal (dummy)
-  openShowModal(req: Request) {
-    this.currentRequest = req;
-    this.isShowModalOpen = true;
-  }
-  closeShowModal() {
-    this.isShowModalOpen = false;
-    this.currentRequest = null;
-  }
-
-  // Dummy methods for Delete (just removes from the array)
-  deleteRequest(req: Request) {
-    this.requests = this.requests.filter(r => r.id !== req.id);
-    // Optionally update totalRequests
+  loadRequests(): void {
+    this.requests = this.requestService.getRequestsByUser(this.userId);
     this.totalRequests = this.requests.length;
   }
 
-  // Filtered requests based on search text and date (simple filter)
-  get filteredRequests() {
-    return this.requests.filter(req => {
-      const matchesSearch = req.type.toLowerCase().includes(this.searchText.toLowerCase()) ||
-        req.address.toLowerCase().includes(this.searchText.toLowerCase());
-      const matchesDate = this.filterDate ? req.date === this.filterDate : true;
-      return matchesSearch && matchesDate;
-    });
+  calculateScore(): void {
+    this.myScore = this.requests.filter(req => req.status === 'validated').length * 10;
+  }
+
+  openAddModal(): void {
+    this.newRequest = {
+      type: '',
+      weight: 1000,
+      address: '',
+      date: '',
+      timeSlot: '',
+      notes: ''
+    };
+    this.isAddModalOpen = true;
+  }
+
+  closeAddModal(): void {
+    this.isAddModalOpen = false;
+  }
+
+  validateForm(): boolean {
+    this.formErrors = {
+      type: !this.newRequest.type,
+      weight: this.newRequest.weight! < 1000,
+      address: !this.newRequest.address,
+      date: !this.newRequest.date,
+      timeSlot: !this.newRequest.timeSlot || !/^(0[9-9]|1[0-8]):[0-5][0-9]-(0[9-9]|1[0-8]):[0-5][0-9]$/.test(this.newRequest.timeSlot)
+    };
+
+    return !Object.values(this.formErrors).some(error => error);
+  }
+
+  addRequest(): void {
+    if (!this.validateForm()) return;
+
+    const request: Request = {
+      id: this.generateRequestId(),
+      userId: this.userId,
+      type: this.newRequest.type!,
+      weight: this.newRequest.weight!,
+      address: this.newRequest.address!,
+      date: this.newRequest.date!,
+      timeSlot: this.newRequest.timeSlot!,
+      notes: this.newRequest.notes || '',
+      status: 'pending'
+    };
+
+    const success = this.requestService.addRequest(request);
+    if (success) {
+      this.loadRequests();
+      this.calculateScore();
+      this.closeAddModal();
+    } else {
+      alert('You have reached the request limit (3 pending requests or max 10kg total).');
+    }
+  }
+
+  generateRequestId(): number {
+    return this.requests.length > 0 ? Math.max(...this.requests.map(req => req.id)) + 1 : 1;
+  }
+
+  deleteRequest(req: Request): void {
+    const success = this.requestService.deleteRequest(req.id, this.userId);
+    if (success) {
+      this.loadRequests();
+      this.calculateScore();
+    } else {
+      alert('Cannot delete this request.');
+    }
+  }
+
+  openEditModal(req: Request): void {
+    this.currentRequest = { ...req };
+    this.isEditModalOpen = true;
+  }
+
+  closeEditModal(): void {
+    this.isEditModalOpen = false;
+  }
+
+  updateRequest(): void {
+    if (!this.currentRequest) return;
+
+    const success = this.requestService.updateRequest(this.currentRequest);
+    if (success) {
+      this.loadRequests();
+      this.isEditModalOpen = false;
+    } else {
+      alert('Cannot update this request.');
+    }
+  }
+
+  openShowModal(req: Request): void {
+    this.currentRequest = req;
+    this.isShowModalOpen = true;
+  }
+
+  closeShowModal(): void {
+    this.isShowModalOpen = false;
+  }
+
+  get filteredRequests(): Request[] {
+    return this.requests.filter(req =>
+      req.type.toLowerCase().includes(this.searchText.toLowerCase()) ||
+      req.address.toLowerCase().includes(this.searchText.toLowerCase())
+    );
   }
 }

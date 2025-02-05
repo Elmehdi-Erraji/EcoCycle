@@ -2,9 +2,7 @@
   <!-- Summary Cards -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <!-- Total Requests Card -->
-    <div
-      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
-    >
+    <div class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50">
       <div class="p-6">
         <span class="material-icons text-green-600 text-5xl">assignment</span>
       </div>
@@ -15,9 +13,7 @@
     </div>
 
     <!-- Score Card -->
-    <div
-      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
-    >
+    <div class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50">
       <div class="p-6">
         <span class="material-icons text-green-600 text-5xl">star</span>
       </div>
@@ -41,7 +37,6 @@
           class="w-64 pl-9 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
         />
       </div>
-
     </div>
 
     <!-- Add Button -->
@@ -59,54 +54,19 @@
     <table class="min-w-full divide-y divide-gray-200">
       <thead>
       <tr class="bg-green-100">
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          ID
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Type
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Weight (g)
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Address
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Date
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Time Slot
-        </th>
-        <th
-          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Status
-        </th>
-        <!-- Center this column and simply label it “Actions” -->
-        <th
-          class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
-        >
-          Actions
-        </th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">ID</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Weight (g)</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Address</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Time Slot</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+        <!-- Actions Column -->
+        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
       </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-      <tr
-        *ngFor="let req of filteredRequests"
-        class="transition hover:bg-gray-50"
-      >
+      <tr *ngFor="let req of filteredRequests" class="transition hover:bg-gray-50">
         <td class="px-6 py-4 whitespace-nowrap">{{ req.id }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.type }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.weight }}</td>
@@ -114,14 +74,10 @@
         <td class="px-6 py-4 whitespace-nowrap">{{ req.date }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.timeSlot }}</td>
         <td class="px-6 py-4 whitespace-nowrap">
-          <span
-            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
-          >
-            {{ req.status }}
-          </span>
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              {{ req.status }}
+            </span>
         </td>
-        <!-- Actions column: just icons, same line -->
-        <!-- Action icons in the table cell -->
         <td class="px-6 py-4 whitespace-nowrap text-center">
           <div class="flex justify-center items-center space-x-3">
             <!-- Edit Button -->
@@ -132,7 +88,6 @@
             >
               <span class="material-icons text-base">edit</span>
             </button>
-
             <!-- Delete Button -->
             <button
               (click)="deleteRequest(req)"
@@ -141,7 +96,6 @@
             >
               <span class="material-icons text-base">delete</span>
             </button>
-
             <!-- Show Button -->
             <button
               (click)="openShowModal(req)"
@@ -157,88 +111,129 @@
     </table>
   </div>
 
-
   <!-- Add Request Modal -->
-  <!--
-    Here we use optional [ngClass] for a fade/scale transition.
-    The *ngIf will conditionally insert/remove the element,
-    but you still get a quick fade effect if you want to
-    animate while it’s present.
-  -->
   <div
     *ngIf="isAddModalOpen"
     class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
     (click)="closeAddModal()"
   >
     <div
-      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 scale-100"
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300"
       (click)="$event.stopPropagation()"
       [ngClass]="{
-        'opacity-100 translate-y-0': isAddModalOpen,
-        'opacity-0 -translate-y-10': !isAddModalOpen
-      }"
+      'opacity-100 translate-y-0': isAddModalOpen,
+      'opacity-0 -translate-y-10': !isAddModalOpen
+    }"
     >
       <h2 class="text-2xl font-bold mb-4 text-gray-800">Add New Request</h2>
-      <!-- Form fields for adding a new request (dummy UI) -->
-      <div class="space-y-4">
-        <div>
-          <label class="block text-gray-700">Type of Waste</label>
-          <input
-            type="text"
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="e.g., Plastique, Verre"
-          />
+      <!-- Form fields for adding a new request -->
+      <form (ngSubmit)="addRequest()">
+        <div class="space-y-4">
+          <!-- Waste Type Dropdown -->
+          <div>
+            <label class="block text-gray-700">Type of Waste</label>
+            <select
+              [(ngModel)]="newRequest.type"
+              name="type"
+              required
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+            >
+              <option value="" disabled selected>Select type</option>
+              <option value="plastique">Plastique</option>
+              <option value="verre">Verre</option>
+              <option value="papier">Papier</option>
+              <option value="métal">Métal</option>
+            </select>
+            <p *ngIf="formErrors.type" class="text-red-500 text-sm">Type is required.</p>
+          </div>
+
+          <!-- Estimated Weight -->
+          <div>
+            <label class="block text-gray-700">Estimated Weight (g)</label>
+            <input
+              type="number"
+              [(ngModel)]="newRequest.weight"
+              name="weight"
+              required
+              min="1000"
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+            />
+            <p *ngIf="formErrors.weight" class="text-red-500 text-sm">Minimum weight is 1000g.</p>
+          </div>
+
+          <!-- Collection Address -->
+          <div>
+            <label class="block text-gray-700">Collection Address</label>
+            <input
+              type="text"
+              [(ngModel)]="newRequest.address"
+              name="address"
+              required
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+              placeholder="Enter address"
+            />
+            <p *ngIf="formErrors.address" class="text-red-500 text-sm">Address is required.</p>
+          </div>
+
+          <!-- Date -->
+          <div>
+            <label class="block text-gray-700">Date</label>
+            <input
+              type="date"
+              [(ngModel)]="newRequest.date"
+              name="date"
+              required
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+            />
+            <p *ngIf="formErrors.date" class="text-red-500 text-sm">Valid date is required.</p>
+          </div>
+
+          <!-- Time Slot -->
+          <div>
+            <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
+            <input
+              type="text"
+              [(ngModel)]="newRequest.timeSlot"
+              name="timeSlot"
+              required
+              pattern="(0[9-9]|1[0-8]):[0-5][0-9]-(0[9-9]|1[0-8]):[0-5][0-9]"
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+              placeholder="e.g., 09:00-12:00"
+            />
+            <p *ngIf="formErrors.timeSlot" class="text-red-500 text-sm">
+              Time slot must be between 09:00 and 18:00 (e.g., 09:00-12:00).
+            </p>
+          </div>
+
+          <!-- Additional Notes -->
+          <div>
+            <label class="block text-gray-700">Additional Notes</label>
+            <textarea
+              [(ngModel)]="newRequest.notes"
+              name="notes"
+              class="w-full px-3 py-2 border rounded focus:border-green-500"
+              placeholder="Optional"
+            ></textarea>
+          </div>
         </div>
-        <div>
-          <label class="block text-gray-700">Estimated Weight (g)</label>
-          <input
-            type="number"
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="Minimum 1000g"
-          />
+
+        <!-- Form Actions -->
+        <div class="flex justify-end space-x-4 mt-6">
+          <button
+            type="button"
+            (click)="closeAddModal()"
+            class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+          >
+            Submit
+          </button>
         </div>
-        <div>
-          <label class="block text-gray-700">Collection Address</label>
-          <input
-            type="text"
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="Enter address"
-          />
-        </div>
-        <div>
-          <label class="block text-gray-700">Date</label>
-          <input
-            type="date"
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-          />
-        </div>
-        <div>
-          <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
-          <input
-            type="text"
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="e.g., 09:00-12:00"
-          />
-        </div>
-        <div>
-          <label class="block text-gray-700">Additional Notes</label>
-          <textarea
-            class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="Optional"
-          ></textarea>
-        </div>
-      </div>
-      <div class="flex justify-end space-x-4 mt-6">
-        <button
-          (click)="closeAddModal()"
-          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
-        >
-          Cancel
-        </button>
-        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
-          Submit
-        </button>
-      </div>
+      </form>
     </div>
   </div>
 
@@ -259,17 +254,55 @@
       <h2 class="text-2xl font-bold mb-4 text-gray-800">
         Edit Request #{{ currentRequest?.id }}
       </h2>
-      <!-- Form fields for editing (dummy UI) -->
-      <div class="space-y-4">
+      <!-- Form fields for editing the request -->
+      <div class="space-y-4" *ngIf="currentRequest">
         <div>
           <label class="block text-gray-700">Type of Waste</label>
           <input
             type="text"
+            [(ngModel)]="currentRequest.type"
             class="w-full px-3 py-2 border rounded focus:border-green-500"
-            [value]="currentRequest?.type"
           />
         </div>
-        <!-- Additional fields... -->
+        <div>
+          <label class="block text-gray-700">Estimated Weight (g)</label>
+          <input
+            type="number"
+            [(ngModel)]="currentRequest.weight"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Collection Address</label>
+          <input
+            type="text"
+            [(ngModel)]="currentRequest.address"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Date</label>
+          <input
+            type="date"
+            [(ngModel)]="currentRequest.date"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
+          <input
+            type="text"
+            [(ngModel)]="currentRequest.timeSlot"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Additional Notes</label>
+          <textarea
+            [(ngModel)]="currentRequest.notes"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          ></textarea>
+        </div>
       </div>
       <div class="flex justify-end space-x-4 mt-6">
         <button
@@ -278,7 +311,10 @@
         >
           Cancel
         </button>
-        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+        <button
+          (click)="updateRequest()"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
           Save Changes
         </button>
       </div>
@@ -302,27 +338,27 @@
       <h2 class="text-2xl font-bold mb-4 text-gray-800">
         Request Details #{{ currentRequest?.id }}
       </h2>
-      <div class="space-y-4 text-gray-700">
+      <div class="space-y-4 text-gray-700" *ngIf="currentRequest">
         <p>
-          <strong>Type:</strong> {{ currentRequest?.type }}
+          <strong>Type:</strong> {{ currentRequest.type }}
         </p>
         <p>
-          <strong>Weight:</strong> {{ currentRequest?.weight }}g
+          <strong>Weight:</strong> {{ currentRequest.weight }}g
         </p>
         <p>
-          <strong>Address:</strong> {{ currentRequest?.address }}
+          <strong>Address:</strong> {{ currentRequest.address }}
         </p>
         <p>
-          <strong>Date:</strong> {{ currentRequest?.date }}
+          <strong>Date:</strong> {{ currentRequest.date }}
         </p>
         <p>
-          <strong>Time Slot:</strong> {{ currentRequest?.timeSlot }}
+          <strong>Time Slot:</strong> {{ currentRequest.timeSlot }}
         </p>
         <p>
-          <strong>Status:</strong> {{ currentRequest?.status }}
+          <strong>Status:</strong> {{ currentRequest.status }}
         </p>
         <p>
-          <strong>Notes:</strong> {{ currentRequest?.notes || 'N/A' }}
+          <strong>Notes:</strong> {{ currentRequest.notes || 'N/A' }}
         </p>
       </div>
       <div class="flex justify-end mt-6">
