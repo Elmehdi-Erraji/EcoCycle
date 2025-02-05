@@ -1,1 +1,338 @@
-<p>dash works for individual!</p>
+<div class="p-6 space-y-8 bg-gray-50">
+  <!-- Summary Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Total Requests Card -->
+    <div
+      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
+    >
+      <div class="p-6">
+        <span class="material-icons text-green-600 text-5xl">assignment</span>
+      </div>
+      <div class="ml-4 py-4 pr-6">
+        <h2 class="text-lg font-semibold text-gray-700">My Requests</h2>
+        <p class="text-3xl font-extrabold text-green-700">{{ totalRequests }}</p>
+      </div>
+    </div>
+
+    <!-- Score Card -->
+    <div
+      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
+    >
+      <div class="p-6">
+        <span class="material-icons text-green-600 text-5xl">star</span>
+      </div>
+      <div class="ml-4 py-4 pr-6">
+        <h2 class="text-lg font-semibold text-gray-700">My Score</h2>
+        <p class="text-3xl font-extrabold text-green-700">{{ myScore }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Controls -->
+  <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+    <div class="flex items-center space-x-4">
+      <!-- Search Bar -->
+      <div class="relative">
+        <span class="material-icons absolute left-2 top-2.5 text-gray-400">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search requests..."
+          class="w-64 pl-9 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+        />
+      </div>
+
+    </div>
+
+    <!-- Add Button -->
+    <button
+      (click)="openAddModal()"
+      class="flex items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 shadow"
+    >
+      <span class="material-icons mr-2 text-white">add</span>
+      Add Request
+    </button>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="overflow-x-auto bg-white shadow rounded-lg mt-4">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
+      <tr class="bg-green-100">
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          ID
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Type
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Weight (g)
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Address
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Date
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Time Slot
+        </th>
+        <th
+          class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Status
+        </th>
+        <!-- Center this column and simply label it “Actions” -->
+        <th
+          class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider"
+        >
+          Actions
+        </th>
+      </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+      <tr
+        *ngFor="let req of filteredRequests"
+        class="transition hover:bg-gray-50"
+      >
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.id }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.type }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.weight }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.address }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.date }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.timeSlot }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span
+            class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800"
+          >
+            {{ req.status }}
+          </span>
+        </td>
+        <!-- Actions column: just icons, same line -->
+        <!-- Action icons in the table cell -->
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+          <div class="flex justify-center items-center space-x-3">
+            <!-- Edit Button -->
+            <button
+              (click)="openEditModal(req)"
+              class="text-blue-600 hover:text-blue-800"
+              title="Edit"
+            >
+              <span class="material-icons text-base">edit</span>
+            </button>
+
+            <!-- Delete Button -->
+            <button
+              (click)="deleteRequest(req)"
+              class="text-red-600 hover:text-red-800"
+              title="Delete"
+            >
+              <span class="material-icons text-base">delete</span>
+            </button>
+
+            <!-- Show Button -->
+            <button
+              (click)="openShowModal(req)"
+              class="text-green-600 hover:text-green-800"
+              title="Show"
+            >
+              <span class="material-icons text-base">visibility</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+
+  <!-- Add Request Modal -->
+  <!--
+    Here we use optional [ngClass] for a fade/scale transition.
+    The *ngIf will conditionally insert/remove the element,
+    but you still get a quick fade effect if you want to
+    animate while it’s present.
+  -->
+  <div
+    *ngIf="isAddModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeAddModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 scale-100"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+        'opacity-100 translate-y-0': isAddModalOpen,
+        'opacity-0 -translate-y-10': !isAddModalOpen
+      }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Add New Request</h2>
+      <!-- Form fields for adding a new request (dummy UI) -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700">Type of Waste</label>
+          <input
+            type="text"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            placeholder="e.g., Plastique, Verre"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Estimated Weight (g)</label>
+          <input
+            type="number"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            placeholder="Minimum 1000g"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Collection Address</label>
+          <input
+            type="text"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            placeholder="Enter address"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Date</label>
+          <input
+            type="date"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
+          <input
+            type="text"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            placeholder="e.g., 09:00-12:00"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Additional Notes</label>
+          <textarea
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            placeholder="Optional"
+          ></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-4 mt-6">
+        <button
+          (click)="closeAddModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Edit Request Modal -->
+  <div
+    *ngIf="isEditModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeEditModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+        'opacity-100 translate-y-0': isEditModalOpen,
+        'opacity-0 -translate-y-10': !isEditModalOpen
+      }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Edit Request #{{ currentRequest?.id }}
+      </h2>
+      <!-- Form fields for editing (dummy UI) -->
+      <div class="space-y-4">
+        <div>
+          <label class="block text-gray-700">Type of Waste</label>
+          <input
+            type="text"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+            [value]="currentRequest?.type"
+          />
+        </div>
+        <!-- Additional fields... -->
+      </div>
+      <div class="flex justify-end space-x-4 mt-6">
+        <button
+          (click)="closeEditModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+        <button class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show Request Modal -->
+  <div
+    *ngIf="isShowModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeShowModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+        'opacity-100 translate-y-0': isShowModalOpen,
+        'opacity-0 -translate-y-10': !isShowModalOpen
+      }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Request Details #{{ currentRequest?.id }}
+      </h2>
+      <div class="space-y-4 text-gray-700">
+        <p>
+          <strong>Type:</strong> {{ currentRequest?.type }}
+        </p>
+        <p>
+          <strong>Weight:</strong> {{ currentRequest?.weight }}g
+        </p>
+        <p>
+          <strong>Address:</strong> {{ currentRequest?.address }}
+        </p>
+        <p>
+          <strong>Date:</strong> {{ currentRequest?.date }}
+        </p>
+        <p>
+          <strong>Time Slot:</strong> {{ currentRequest?.timeSlot }}
+        </p>
+        <p>
+          <strong>Status:</strong> {{ currentRequest?.status }}
+        </p>
+        <p>
+          <strong>Notes:</strong> {{ currentRequest?.notes || 'N/A' }}
+        </p>
+      </div>
+      <div class="flex justify-end mt-6">
+        <button
+          (click)="closeShowModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
