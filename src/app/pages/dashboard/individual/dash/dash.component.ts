@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RequestService } from '../../../../core/services/request.service';
 import { AuthService } from '../../../../core/services/auth-service.service';
 import { Request } from '../../../../core/models/request.model';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-dash',
@@ -12,21 +13,17 @@ import { Request } from '../../../../core/models/request.model';
   templateUrl: './dash.component.html',
   styleUrls: ['./dash.component.css']
 })
-export class DashComponent implements OnInit {
+export class DashComponent implements OnInit, OnDestroy {
   totalRequests = 0;
   myScore = 0;
   userId: string = '';
-
-  // Requests
   requests: Request[] = [];
   searchText = '';
   isAddModalOpen = false;
   isEditModalOpen = false;
   isShowModalOpen = false;
   currentRequest: Request | null = null;
-
-  // Available waste types
-  wasteTypes: string[] = ['plastique', 'verre', 'papier', 'métal'];
+  private subscription!: Subscription;
 
   newRequest: Partial<Request> = {
     type: '',
@@ -37,14 +34,6 @@ export class DashComponent implements OnInit {
     notes: ''
   };
 
-  formErrors = {
-    type: false,
-    weight: false,
-    address: false,
-    date: false,
-    timeSlot: false
-  };
-
   constructor(
     private requestService: RequestService,
     private authService: AuthService
@@ -53,15 +42,19 @@ export class DashComponent implements OnInit {
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      this.userId = currentUser.email; // Using email as a unique ID
-      this.loadRequests();
-      this.calculateScore();
+      this.userId = currentUser.email;
+      this.subscription = this.requestService.requests$.subscribe(requests => {
+        this.requests = requests.filter(req => req.userId === this.userId);
+        this.totalRequests = this.requests.length;
+        this.calculateScore();
+      });
     }
   }
 
-  loadRequests(): void {
-    this.requests = this.requestService.getRequestsByUser(this.userId);
-    this.totalRequests = this.requests.length;
+  ngOnDestroy(): void {
+    if (this.subscription) {
+      this.subscription.unsubscribe();
+    }
   }
 
   calculateScore(): void {
@@ -84,23 +77,11 @@ export class DashComponent implements OnInit {
     this.isAddModalOpen = false;
   }
 
-  validateForm(): boolean {
-    this.formErrors = {
-      type: !this.newRequest.type,
-      weight: this.newRequest.weight! < 1000,
-      address: !this.newRequest.address,
-      date: !this.newRequest.date,
-      timeSlot: !this.newRequest.timeSlot || !/^(0[9-9]|1[0-8]):[0-5][0-9]-(0[9-9]|1[0-8]):[0-5][0-9]$/.test(this.newRequest.timeSlot)
-    };
-
-    return !Object.values(this.formErrors).some(error => error);
-  }
-
   addRequest(): void {
     if (!this.validateForm()) return;
 
     const request: Request = {
-      id: this.generateRequestId(),
+      id: 0,
       userId: this.userId,
       type: this.newRequest.type!,
       weight: this.newRequest.weight!,
@@ -113,25 +94,17 @@ export class DashComponent implements OnInit {
 
     const success = this.requestService.addRequest(request);
     if (success) {
-      this.loadRequests();
-      this.calculateScore();
+      this.requestService.loadRequests(); // Ensure UI updates instantly
       this.closeAddModal();
     } else {
       alert('You have reached the request limit (3 pending requests or max 10kg total).');
     }
   }
 
-  generateRequestId(): number {
-    return this.requests.length > 0 ? Math.max(...this.requests.map(req => req.id)) + 1 : 1;
-  }
-
   deleteRequest(req: Request): void {
     const success = this.requestService.deleteRequest(req.id, this.userId);
     if (success) {
-      this.loadRequests();
-      this.calculateScore();
-    } else {
-      alert('Cannot delete this request.');
+      this.requestService.loadRequests(); // Ensure UI updates instantly
     }
   }
 
@@ -149,10 +122,10 @@ export class DashComponent implements OnInit {
 
     const success = this.requestService.updateRequest(this.currentRequest);
     if (success) {
-      this.loadRequests();
+      this.requestService.loadRequests(); // Ensure UI updates instantly
       this.isEditModalOpen = false;
     } else {
-      alert('Cannot update this request.');
+      alert('Error updating request.');
     }
   }
 
@@ -163,6 +136,20 @@ export class DashComponent implements OnInit {
 
   closeShowModal(): void {
     this.isShowModalOpen = false;
+  }
+
+  validateForm(): boolean {
+    if (
+      !this.newRequest.type ||
+      this.newRequest.weight! < 1000 ||
+      !this.newRequest.address ||
+      !this.newRequest.date ||
+      !this.newRequest.timeSlot
+    ) {
+      alert('Please fill all required fields with valid data.');
+      return false;
+    }
+    return true;
   }
 
   get filteredRequests(): Request[] {

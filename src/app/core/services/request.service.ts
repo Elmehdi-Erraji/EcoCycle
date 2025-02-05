@@ -1,73 +1,72 @@
 import { Injectable } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
 import { Request } from '../models/request.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class RequestService {
-  private localStorageKey = 'collectRequests';
+  private requestsSubject = new BehaviorSubject<Request[]>(this.loadRequestsFromStorage());
+  requests$ = this.requestsSubject.asObservable(); // Public observable for UI
 
   constructor() {}
 
-  // Get all requests for a specific user
+  private loadRequestsFromStorage(): Request[] {
+    const storedRequests = localStorage.getItem('requests');
+    return storedRequests ? JSON.parse(storedRequests) : [];
+  }
+
+  private saveRequestsToStorage(requests: Request[]): void {
+    localStorage.setItem('requests', JSON.stringify(requests));
+    this.requestsSubject.next(requests); // Notify subscribers of the update
+  }
+
   getRequestsByUser(userId: string): Request[] {
-    const requests: Request[] = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
-    return requests.filter(req => req.userId === userId);
+    return this.requestsSubject.value.filter(req => req.userId === userId);
   }
 
-  // Add a new request
-  addRequest(newRequest: Request): boolean {
-    let requests: Request[] = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
+  addRequest(request: Request): boolean {
+    const requests = this.requestsSubject.value;
 
-    // Ensure the user has max 3 active requests (pending)
-    const userRequests = requests.filter(r => r.userId === newRequest.userId);
-    const activeRequests = userRequests.filter(r => r.status === 'pending');
+    // Validation: Check user limits
+    const userRequests = requests.filter(req => req.userId === request.userId);
+    const pendingRequests = userRequests.filter(req => req.status === 'pending');
+    const totalWeight = userRequests.reduce((sum, req) => sum + req.weight, 0);
 
-    if (activeRequests.length >= 3) {
-      return false; // Limit reached
+    if (pendingRequests.length >= 3 || totalWeight + request.weight > 10000) {
+      return false; // Limit exceeded
     }
 
-    // Ensure total weight does not exceed 10kg (10000 grams)
-    const totalWeight = activeRequests.reduce((sum, r) => sum + r.weight, 0) + newRequest.weight;
-    if (totalWeight > 10000) {
-      return false; // Max weight reached
-    }
+    request.id = new Date().getTime(); // Unique ID
+    const updatedRequests = [...requests, request];
 
-    // Assign a unique ID
-    newRequest.id = requests.length > 0 ? Math.max(...requests.map(r => r.id)) + 1 : 1;
-    newRequest.status = 'pending'; // Default status
-
-    // Save the request
-    requests.push(newRequest);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(requests));
+    this.saveRequestsToStorage(updatedRequests);
     return true;
   }
 
-  // Delete a request (only if it's still pending)
-  deleteRequest(requestId: number, userId: string): boolean {
-    let requests: Request[] = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
-    const requestIndex = requests.findIndex(r => r.id === requestId && r.userId === userId);
+  deleteRequest(id: number, userId: string): boolean {
+    let requests = this.requestsSubject.value;
+    const updatedRequests = requests.filter(req => req.id !== id || req.userId !== userId);
 
-    if (requestIndex === -1 || requests[requestIndex].status !== 'pending') {
-      return false; // Can't delete non-pending requests
-    }
-
-    requests.splice(requestIndex, 1);
-    localStorage.setItem(this.localStorageKey, JSON.stringify(requests));
+    this.saveRequestsToStorage(updatedRequests);
     return true;
   }
 
-  // Update an existing request (only if it's still pending)
   updateRequest(updatedRequest: Request): boolean {
-    let requests: Request[] = JSON.parse(localStorage.getItem(this.localStorageKey) || '[]');
-    const index = requests.findIndex(r => r.id === updatedRequest.id && r.userId === updatedRequest.userId);
+    let requests = this.requestsSubject.value;
+    const index = requests.findIndex(req => req.id === updatedRequest.id);
 
-    if (index === -1 || requests[index].status !== 'pending') {
-      return false; // Can't update non-pending requests
+    if (index !== -1) {
+      requests[index] = updatedRequest;
+      this.saveRequestsToStorage([...requests]); // Update and notify UI
+      return true;
     }
 
-    requests[index] = updatedRequest;
-    localStorage.setItem(this.localStorageKey, JSON.stringify(requests));
-    return true;
+    return false;
+  }
+
+  loadRequests(): void {
+    const updatedRequests = this.loadRequestsFromStorage();
+    this.requestsSubject.next(updatedRequests);
   }
 }
