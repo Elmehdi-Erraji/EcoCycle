@@ -132,21 +132,24 @@
           </p>
         </div>
 
-        <!-- Profile Picture Field (Optional) -->
+        <!-- Profile Picture Upload Field (Optional) -->
         <div class="mb-4">
           <label for="profilePicture" class="block text-green-700 text-sm font-bold mb-1">
-            Profile Picture URL (optional)
+            Profile Picture (optional)
           </label>
           <input
             id="profilePicture"
-            type="text"
-            formControlName="profilePicture"
-            placeholder="Profile Picture URL"
+            type="file"
+            (change)="onFileSelected($event)"
+            accept="image/*"
             class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
           />
+          <div *ngIf="selectedFileName" class="text-green-700 text-sm mt-1">
+            Selected File: {{ selectedFileName }}
+          </div>
         </div>
 
-        <!-- Submit Button (Always clickable) -->
+        <!-- Submit Button -->
         <div class="flex items-center justify-center">
           <button
             type="submit"
@@ -154,11 +157,10 @@
           >
             Register
           </button>
-
         </div>
       </form>
 
-      <!-- Login Redirect Link (Clickable) -->
+      <!-- Login Redirect Link -->
       <div class="text-center mt-4">
         <a routerLink="/login" class="text-green-600 hover:text-green-700 font-bold cursor-pointer">
           Already have an account? Login

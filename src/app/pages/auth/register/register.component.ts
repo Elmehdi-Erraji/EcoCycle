@@ -9,7 +9,7 @@ import {
   ValidationErrors
 } from '@angular/forms';
 import { Router } from '@angular/router';
-import { RouterModule } from '@angular/router';  // <-- Import RouterModule
+import { RouterModule } from '@angular/router';
 import { AuthService } from '../../../core/services/auth-service.service';
 import { User } from '../../../core/models/user.model';
 
@@ -31,12 +31,13 @@ function minimumAgeValidator(minAge: number) {
 @Component({
   selector: 'app-register',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, RouterModule],  // <-- Add RouterModule here
+  imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './register.component.html'
 })
 export class RegisterComponent implements OnInit {
   registerForm!: FormGroup;
   errorMsg: string = '';
+  selectedFileName: string = ''; // To display the chosen file name
 
   constructor(
     private fb: FormBuilder,
@@ -53,8 +54,24 @@ export class RegisterComponent implements OnInit {
       address: ['', Validators.required],
       phone: ['', Validators.required],
       dateOfBirth: ['', [Validators.required, minimumAgeValidator(18)]],
-      profilePicture: ['']
+      profilePicture: [''] // Will hold the Base64 string
     });
+  }
+
+  // Called when the user selects a file
+  onFileSelected(event: any): void {
+    const file: File = event.target.files[0];
+    if (file) {
+      this.selectedFileName = file.name; // Save the file name to display it
+      const reader = new FileReader();
+      reader.onload = () => {
+        // Set the Base64 string as the profilePicture value in the form
+        this.registerForm.patchValue({
+          profilePicture: reader.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
   }
 
   onSubmit(): void {
@@ -63,7 +80,7 @@ export class RegisterComponent implements OnInit {
 
     if (this.registerForm.valid) {
       const newUser: User = this.registerForm.value;
-      // Set default role and score
+      // Set default role and score for a "particulier"
       newUser.role = 'particulier';
       newUser.score = 0;
       if (this.authService.register(newUser)) {

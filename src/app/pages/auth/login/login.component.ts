@@ -75,14 +75,11 @@ export class LoginComponent implements OnInit {
   // Redirect the user based on their role
   private redirectUser(role: string): void {
     switch (role) {
-      case 'ADMIN':
-        this.router.navigate(['/admin']);
+      case 'collector':
+        this.router.navigate(['/collector']);
         break;
-      case 'JURY':
-        this.router.navigate(['/jury']);
-        break;
-      case 'MEMBER':
-        this.router.navigate(['/member']);
+      case 'particulier':
+        this.router.navigate(['/particulier']);
         break;
       default:
         this.router.navigate(['/success']);

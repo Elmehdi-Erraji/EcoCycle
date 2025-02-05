@@ -1,0 +1,372 @@
+<div class="flex h-screen overflow-hidden">
+  <!-- Sidebar -->
+  <div
+    [class.hidden]="!isSidebarOpen && isMobile"
+    [class.md:block]="!isMobile"
+    class="fixed md:relative w-64 bg-green-800 text-green-100 p-5 h-full transform transition-all duration-300 ease-in-out z-20 shadow-lg"
+  >
+    <!-- Logo -->
+    <h1 class="text-xl font-bold mb-8 text-white">Eco League</h1>
+
+    <!-- Menu Items -->
+    <ul class="space-y-2">
+      <!-- Dashboard -->
+      <li class="relative py-2 px-3 rounded-lg transition-all duration-200 group">
+        <a
+          routerLink="dashboard"
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white rounded-lg transition-all duration-200 hover:bg-green-600 p-2"
+        >
+          <span class="flex items-center">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              dashboard
+            </span>
+            Dashboard
+          </span>
+        </a>
+      </li>
+
+      <!-- Collection -->
+      <li class="relative">
+        <div
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white transition-all duration-200 hover:bg-green-600 p-2 rounded-lg"
+          (click)="toggleSidebarDropdown('collection')"
+        >
+          <span class="flex items-center w-full">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              recycling
+            </span>
+            Collection
+          </span>
+
+        </div>
+        <ul
+          class="mt-2 space-y-1 overflow-hidden transition-all duration-200"
+          [class.max-h-0]="!dropdowns['collection']"
+          [class.opacity-0]="!dropdowns['collection']"
+          [class.max-h-48]="dropdowns['collection']"
+          [class.opacity-100]="dropdowns['collection']"
+        >
+          <li>
+            <a
+              routerLink="collection/create"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              Add Item
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="collection/list"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              List Items
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Centers -->
+      <li class="relative">
+        <div
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white transition-all duration-200 hover:bg-green-600 p-2 rounded-lg"
+          (click)="toggleSidebarDropdown('centers')"
+        >
+          <span class="flex items-center w-full">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              storefront
+            </span>
+            Centers
+          </span>
+
+
+        </div>
+        <ul
+          class="mt-2 space-y-1 overflow-hidden transition-all duration-200"
+          [class.max-h-0]="!dropdowns['centers']"
+          [class.opacity-0]="!dropdowns['centers']"
+          [class.max-h-48]="dropdowns['centers']"
+          [class.opacity-100]="dropdowns['centers']"
+        >
+          <li>
+            <a
+              routerLink="centers/create"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              Create Center
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="centers/list"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              List Centers
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Events -->
+      <li class="relative">
+        <div
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white transition-all duration-200 hover:bg-green-600 p-2 rounded-lg"
+          (click)="toggleSidebarDropdown('events')"
+        >
+          <span class="flex items-center w-full">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              emoji_events
+            </span>
+            Events
+          </span>
+
+        </div>
+        <ul
+          class="mt-2 space-y-1 overflow-hidden transition-all duration-200"
+          [class.max-h-0]="!dropdowns['events']"
+          [class.opacity-0]="!dropdowns['events']"
+          [class.max-h-48]="dropdowns['events']"
+          [class.opacity-100]="dropdowns['events']"
+        >
+          <li>
+            <a
+              routerLink="events/create"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              Create Event
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="events/list"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              List Events
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Volunteering -->
+      <li class="relative">
+        <div
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white transition-all duration-200 hover:bg-green-600 p-2 rounded-lg"
+          (click)="toggleSidebarDropdown('volunteering')"
+        >
+          <span class="flex items-center w-full">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              volunteer_activism
+            </span>
+            Volunteering
+          </span>
+
+        </div>
+        <ul
+          class="mt-2 space-y-1 overflow-hidden transition-all duration-200"
+          [class.max-h-0]="!dropdowns['volunteering']"
+          [class.opacity-0]="!dropdowns['volunteering']"
+          [class.max-h-48]="dropdowns['volunteering']"
+          [class.opacity-100]="dropdowns['volunteering']"
+        >
+          <li>
+            <a
+              routerLink="volunteering/apply"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              Apply Opportunity
+            </a>
+          </li>
+          <li>
+            <a
+              routerLink="volunteering/list"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              List Opportunities
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- Reports -->
+      <li class="relative">
+        <div
+          class="flex items-center justify-between w-full cursor-pointer text-green-100 hover:text-white transition-all duration-200 hover:bg-green-600 p-2 rounded-lg"
+          (click)="toggleSidebarDropdown('reports')"
+        >
+          <span class="flex items-center w-full">
+            <span class="material-icons mr-2 text-green-300 group-hover:text-green-100">
+              bar_chart
+            </span>
+            Reports
+          </span>
+        </div>
+        <ul
+          class="mt-2 space-y-1 overflow-hidden transition-all duration-200"
+          [class.max-h-0]="!dropdowns['reports']"
+          [class.opacity-0]="!dropdowns['reports']"
+          [class.max-h-48]="dropdowns['reports']"
+          [class.opacity-100]="dropdowns['reports']"
+        >
+          <li>
+            <a
+              routerLink="reports/impact"
+              routerLinkActive="bg-green-700 text-white"
+              class="block py-2 px-3 text-green-100 hover:bg-green-700 hover:text-white rounded-lg"
+            >
+              Impact Report
+            </a>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 flex flex-col overflow-y-auto transition-all duration-300">
+    <!-- Top Bar -->
+    <div class="bg-white shadow p-4 flex justify-between items-center sticky top-0 z-10">
+      <!-- Left Section: Toggle Button and Search Bar -->
+      <div class="flex items-center space-x-4">
+        <!-- Toggle Button -->
+        <button class="toggle-button md:hidden text-green-600 focus:outline-none" (click)="toggleSidebar()">
+          <span class="material-icons">menu</span>
+        </button>
+        <!-- Search Bar -->
+        <div class="relative">
+          <input
+            type="text"
+            placeholder="Search..."
+            class="w-64 px-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200"
+          />
+          <span class="material-icons absolute right-3 top-2 text-gray-400">search</span>
+        </div>
+      </div>
+      <!-- Right Section: Icons and Profile Dropdown -->
+      <div class="flex items-center space-x-6">
+        <!-- Messages Icon with Dropdown -->
+        <div class="relative">
+          <span
+            class="material-icons text-green-600 cursor-pointer hover:text-green-400 transition-all duration-200"
+            (click)="toggleMessagesDropdown()"
+          >
+            mail
+          </span>
+          <!-- Notification Badge -->
+          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">3</span>
+          <!-- Messages Dropdown -->
+          <div
+            *ngIf="isMessagesDropdownOpen"
+            class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 z-20 border border-gray-200"
+          >
+            <div class="px-4 py-2 text-sm text-gray-700 font-semibold">Messages</div>
+            <!-- Dummy Messages -->
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+              <span class="material-icons mr-2 text-green-600">mail</span>
+              <div>
+                <p class="text-sm font-medium">New Collection Update</p>
+                <p class="text-xs text-gray-500">A new recycling item was added.</p>
+              </div>
+            </a>
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+              <span class="material-icons mr-2 text-green-600">mail</span>
+              <div>
+                <p class="text-sm font-medium">Center Alert</p>
+                <p class="text-xs text-gray-500">A center has a new schedule.</p>
+              </div>
+            </a>
+            <div class="border-t border-gray-200 mt-2 pt-2">
+              <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100">
+                View All Messages
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Notifications Icon with Dropdown -->
+        <div class="relative">
+          <span
+            class="material-icons text-green-600 cursor-pointer hover:text-green-400 transition-all duration-200"
+            (click)="toggleNotificationsDropdown()"
+          >
+            notifications
+          </span>
+          <!-- Notification Badge -->
+          <span class="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1.5 py-0.5">5</span>
+          <!-- Notifications Dropdown -->
+          <div
+            *ngIf="isNotificationsDropdownOpen"
+            class="absolute right-0 mt-2 w-64 bg-white rounded-md shadow-lg py-2 z-20 border border-gray-200"
+          >
+            <div class="px-4 py-2 text-sm text-gray-700 font-semibold">Notifications</div>
+            <!-- Dummy Notifications -->
+            <a href="#" class="flex items-center px-4 py-2 hover:bg-gray-100">
+              <span class="material-icons mr-2 text-green-600">notifications</span>
+              <div>
+                <p class="text-sm font-medium">New Volunteer Signup</p>
+                <p class="text-xs text-gray-500">Someone applied for volunteering.</p>
+              </div>
+            </a>
+            <div class="border-t border-gray-200 mt-2 pt-2">
+              <a href="#" class="block px-4 py-2 text-sm text-green-600 hover:bg-gray-100">
+                View All Notifications
+              </a>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Dropdown -->
+        <div class="relative">
+          <div class="relative" (click)="toggleDropdown()">
+            <ng-container *ngIf="user?.profilePicture; else defaultAvatar">
+              <img
+                [src]="(user?.profilePicture || '')"
+                alt="Profile"
+                width="40"
+                height="40"
+                class="w-10 h-10 rounded-full cursor-pointer object-cover"
+              />
+            </ng-container>
+            <ng-template #defaultAvatar>
+    <span class="material-icons text-4xl cursor-pointer">
+      account_circle
+    </span>
+            </ng-template>
+          </div>
+
+          <div
+            *ngIf="isDropdownOpen"
+            class="absolute right-0 mt-2 w-48 bg-white rounded-md shadow-lg py-2 z-20 border border-gray-200"
+          >
+            <a href="/profile" class="flex items-center px-4 py-2 hover:bg-gray-100">
+              <span class="material-icons mr-2 text-green-600">person</span>
+              Profile
+            </a>
+            <a href="/settings" class="flex items-center px-4 py-2 hover:bg-gray-100">
+              <span class="material-icons mr-2 text-green-600">settings</span>
+              Settings
+            </a>
+            <a class="flex items-center px-4 py-2 hover:bg-gray-100 text-red-500">
+              <button
+                (click)="logout()"
+                class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              >
+                Logout
+              </button>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Dynamic Content -->
+    <div class="p-6 bg-gray-50 flex-1 rounded-lg shadow-lg m-6 space-y-6">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</div>
