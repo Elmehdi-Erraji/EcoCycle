@@ -5,6 +5,7 @@ import { RequestService } from '../../../../core/services/request.service';
 import { AuthService } from '../../../../core/services/auth-service.service';
 import { Request } from '../../../../core/models/request.model';
 import { Subscription } from 'rxjs';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-dash',
@@ -94,18 +95,46 @@ export class DashComponent implements OnInit, OnDestroy {
 
     const success = this.requestService.addRequest(request);
     if (success) {
-      this.requestService.loadRequests(); // Ensure UI updates instantly
       this.closeAddModal();
+      Swal.fire({
+        icon: 'success',
+        title: 'Request Added',
+        text: 'Your recycling request has been successfully added!',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } else {
-      alert('You have reached the request limit (3 pending requests or max 10kg total).');
+      Swal.fire({
+        icon: 'error',
+        title: 'Limit Exceeded',
+        text: 'You have reached the request limit (3 pending requests or max 10kg total).',
+        timer: 3000,
+        showConfirmButton: false
+      });
     }
   }
 
   deleteRequest(req: Request): void {
-    const success = this.requestService.deleteRequest(req.id, this.userId);
-    if (success) {
-      this.requestService.loadRequests(); // Ensure UI updates instantly
-    }
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'Do you really want to delete this request?',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.requestService.deleteRequest(req.id, this.userId);
+        Swal.fire({
+          icon: 'success',
+          title: 'Deleted!',
+          text: 'Your request has been deleted.',
+          timer: 2000,
+          showConfirmButton: false
+        });
+      }
+    });
   }
 
   openEditModal(req: Request): void {
@@ -122,10 +151,22 @@ export class DashComponent implements OnInit, OnDestroy {
 
     const success = this.requestService.updateRequest(this.currentRequest);
     if (success) {
-      this.requestService.loadRequests(); // Ensure UI updates instantly
       this.isEditModalOpen = false;
+      Swal.fire({
+        icon: 'success',
+        title: 'Updated Successfully',
+        text: 'Your request has been updated successfully!',
+        timer: 2000,
+        showConfirmButton: false
+      });
     } else {
-      alert('Error updating request.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Update Failed',
+        text: 'Error updating your request. Please try again.',
+        timer: 3000,
+        showConfirmButton: false
+      });
     }
   }
 
@@ -146,7 +187,13 @@ export class DashComponent implements OnInit, OnDestroy {
       !this.newRequest.date ||
       !this.newRequest.timeSlot
     ) {
-      alert('Please fill all required fields with valid data.');
+      Swal.fire({
+        icon: 'error',
+        title: 'Invalid Form',
+        text: 'Please fill all required fields with valid data.',
+        timer: 3000,
+        showConfirmButton: false
+      });
       return false;
     }
     return true;
