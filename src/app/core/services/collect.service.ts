@@ -1,12 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Request, WasteItem } from '../models/request.model';
-
-// A simple User interface. Users must already exist in local storage under the key "users".
-// Do not create a user if it doesn’t exist.
-export interface User {
-  email: string;
-  points: number;
-}
+import { User } from '../models/user.model';
 
 @Injectable({
   providedIn: 'root'
@@ -24,12 +18,12 @@ export class CollectService {
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Get collector's city from currentUser stored in local storage
+  // Get collector's city from the currentUser stored in local storage
   private getCollectorCity(): string {
     const userData = localStorage.getItem(this.currentUserKey);
     if (userData) {
       try {
-        const currentUser = JSON.parse(userData);
+        const currentUser: User = JSON.parse(userData);
         return currentUser.address ? currentUser.address.trim() : '';
       } catch (error) {
         console.error('Error parsing currentUser from localStorage', error);
@@ -38,7 +32,7 @@ export class CollectService {
     return '';
   }
 
-  // Return all requests that are in the collector's city and with a pending status
+  // Return all requests in the collector's city that have a "pending" status
   getRequestsForCurrentUser(): Request[] {
     const collectorCity = this.getCollectorCity().toLowerCase().trim();
     const allRequests = this.getRequests();
@@ -49,7 +43,7 @@ export class CollectService {
     );
   }
 
-  // Update the status of a request in local storage
+  // Update the status of a given request in local storage
   updateRequestStatus(requestId: number, newStatus: Request['status']): void {
     const requests = this.getRequests();
     const index = requests.findIndex(r => r.id === requestId);
@@ -59,7 +53,9 @@ export class CollectService {
     }
   }
 
-  // Accept a pending request: mark it as validated and award points to the request creator.
+  // Accept a pending request:
+  //   - Mark it as "validated" in local storage
+  //   - Award points to the request's creator (user) based on its waste items
   acceptRequest(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
@@ -70,7 +66,7 @@ export class CollectService {
     }
   }
 
-  // Reject a pending request: mark it as rejected.
+  // Reject a pending request: mark its status as "rejected"
   rejectRequest(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
@@ -80,25 +76,23 @@ export class CollectService {
     }
   }
 
-  // Award points based on the waste items in the request. Points are added to the user
-  // identified by request.userId (which should match the email). If the user is not found,
-  // no points are awarded.
+  // Award points to the user who created the request.
+  // The points are calculated by iterating over all waste items in the request.
   private awardPoints(request: Request): void {
     let totalPoints = 0;
-
     if (request.wasteItems && request.wasteItems.length > 0) {
       for (const item of request.wasteItems) {
         totalPoints += this.calculatePointsForItem(item.type, item.weight);
       }
     } else if ((request as any).type && (request as any).weight) {
-      // Fallback if wasteItems is not defined
+      // Fallback in case wasteItems is not present at the root level.
       totalPoints = this.calculatePointsForItem((request as any).type, (request as any).weight);
     }
-
-    this.updateUserPoints(request.userId, totalPoints);
+    this.updateUserScore(request.userId, totalPoints);
   }
 
-  // Calculate points for a single waste item. Weight is assumed in grams.
+  // Calculate points for a single waste item.
+  // Weight is in grams; convert to kg and multiply by the corresponding rate.
   private calculatePointsForItem(wasteType: string, weightInGrams: number): number {
     const weightKg = weightInGrams / 1000;
     let pointsPerKg = 0;
@@ -118,26 +112,51 @@ export class CollectService {
         break;
       default:
         pointsPerKg = 0;
-        break;
     }
     return Math.round(weightKg * pointsPerKg);
   }
 
-  // Retrieve users from local storage (users must already exist)
+  // Retrieve users from local storage. Users must already exist.
   private getUsers(): User[] {
     const stored = localStorage.getItem(this.usersKey);
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Update the user’s points by adding additionalPoints. Do nothing if the user is not found.
-  private updateUserPoints(email: string, additionalPoints: number): void {
+  // Update the user’s score by adding additionalScore.
+  // Also update the currentUser object if it matches the given email.
+  private updateUserScore(email: string, additionalScore: number): void {
     const users = this.getUsers();
     const index = users.findIndex(user => user.email === email);
     if (index !== -1) {
-      users[index].points += additionalPoints;
+      // Initialize the score if it doesn't exist
+      if (typeof users[index].score !== 'number') {
+        users[index].score = 0;
+      }
+      users[index].score += additionalScore;
       localStorage.setItem(this.usersKey, JSON.stringify(users));
+
+      // Also update currentUser if applicable
+      const currentUserData = localStorage.getItem(this.currentUserKey);
+      if (currentUserData) {
+        try {
+          const currentUser: User = JSON.parse(currentUserData);
+          if (currentUser.email === email) {
+            currentUser.score = users[index].score;
+            localStorage.setItem(this.currentUserKey, JSON.stringify(currentUser));
+          }
+        } catch (error) {
+          console.error('Error parsing currentUser from localStorage', error);
+        }
+      }
     } else {
-      console.warn(`User with email ${email} not found. Points not awarded.`);
+      console.warn(`User with email ${email} not found. Score not updated.`);
     }
+  }
+
+  // Optional helper to retrieve a user's current score
+  getUserScore(email: string): number {
+    const users = this.getUsers();
+    const user = users.find(u => u.email === email);
+    return user && typeof user.score === 'number' ? user.score : 0;
   }
 }

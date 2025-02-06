@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import Swal from 'sweetalert2';
 import { Request } from '../../../../core/models/request.model';
 import { CollectService } from '../../../../core/services/collect.service';
 
@@ -47,7 +48,7 @@ export class DashComponent1 implements OnInit {
     return 'Unknown';
   }
 
-  // Helper: Get the weight of the request. If multiple waste items exist, return the sum.
+  // Helper: Get the total weight of the request. If multiple waste items exist, return the sum.
   getRequestWeight(request: Request): number {
     if (request.wasteItems && request.wasteItems.length > 0) {
       return request.wasteItems.reduce((sum, item) => sum + item.weight, 0);
@@ -59,14 +60,34 @@ export class DashComponent1 implements OnInit {
 
   // Accept the selected request
   acceptRequest(request: Request): void {
+    // Call the service method to accept the request
     this.collectService.acceptRequest(request.id);
+    // Show success alert with a message to check collections
+    Swal.fire({
+      icon: 'success',
+      title: 'Request Accepted',
+      text: 'Check your collections.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    // Refresh list and close modal
     this.loadRequests();
     this.closeRequestModal();
   }
 
   // Reject the selected request
   rejectRequest(request: Request): void {
+    // Call the service method to reject the request
     this.collectService.rejectRequest(request.id);
+    // Show rejection alert
+    Swal.fire({
+      icon: 'error',
+      title: 'Request Rejected',
+      text: 'The request has been rejected.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    // Refresh list and close modal
     this.loadRequests();
     this.closeRequestModal();
   }
