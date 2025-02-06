@@ -1,9 +1,13 @@
+export interface WasteItem {
+  type: string;
+  weight: number;
+}
+
 export interface Request {
   id: number;
   userId: string;
-  type: string;
+  wasteItems: WasteItem[];
   photos?: string[];
-  weight: number;
   address: string;
   date: string;
   timeSlot: string;

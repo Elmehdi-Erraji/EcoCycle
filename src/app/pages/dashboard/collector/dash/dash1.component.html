@@ -1,1 +1,60 @@
-<p>dash works for collectors!</p>
+<div class="p-6 space-y-6 bg-gray-50">
+  <!-- Section Title -->
+  <h2 class="text-2xl font-bold text-gray-800">Available Collection Requests</h2>
+
+  <!-- Requests Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div
+      *ngFor="let request of requests"
+      class="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 cursor-pointer"
+      (click)="openRequestModal(request)"
+    >
+      <div class="flex justify-between items-center">
+        <h3 class="text-lg font-semibold text-green-700">{{ request.wasteItems[0].type }}</h3>
+        <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700">{{ request.status }}</span>
+      </div>
+      <p class="text-gray-600 mt-1"><strong>Weight:</strong> {{ request.wasteItems[0].weight }}g</p>
+      <p class="text-gray-600 mt-1"><strong>Address:</strong> {{ request.address }}</p>
+      <p class="text-gray-500 text-sm mt-1">{{ request.date }} | {{ request.timeSlot }}</p>
+    </div>
+  </div>
+
+  <!-- Request Details Modal -->
+  <div
+    *ngIf="selectedRequest"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+  >
+    <div class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md">
+      <h2 class="text-2xl font-bold text-gray-800">Request Details</h2>
+      <p class="text-gray-600 mt-2"><strong>Type:</strong> {{ selectedRequest.wasteItems[0].type }}</p>
+      <p class="text-gray-600"><strong>Weight:</strong> {{ selectedRequest.wasteItems[0].weight }}g</p>
+      <p class="text-gray-600"><strong>Address:</strong> {{ selectedRequest.address }}</p>
+      <p class="text-gray-600"><strong>Date:</strong> {{ selectedRequest.date }}</p>
+      <p class="text-gray-600"><strong>Time Slot:</strong> {{ selectedRequest.timeSlot }}</p>
+      <p class="text-gray-600"><strong>Status:</strong> {{ selectedRequest.status }}</p>
+
+      <!-- Show Photos If Available -->
+      <div class="mt-4" *ngIf="selectedRequest.photos?.length">
+        <h3 class="text-lg font-semibold text-gray-700">Photos</h3>
+        <div class="grid grid-cols-2 gap-2 mt-2">
+          <img
+            *ngFor="let photo of selectedRequest.photos"
+            [src]="photo"
+            alt="Waste Image"
+            class="w-full h-32 object-cover rounded-lg shadow-md"
+          />
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <div class="flex justify-end mt-4">
+        <button
+          (click)="closeRequestModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
