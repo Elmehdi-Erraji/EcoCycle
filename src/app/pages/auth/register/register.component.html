@@ -131,22 +131,33 @@
           </div>
         </div>
 
-        <!-- Profile Picture Upload Field (Full Width) -->
+        <!-- Profile Picture Upload Field (Full Width) with Drag & Drop -->
         <div class="mb-4">
           <label for="profilePicture" class="block text-green-700 text-sm font-bold mb-1">
             Profile Picture (optional)
           </label>
-          <input
-            id="profilePicture"
-            type="file"
-            (change)="onFileSelected($event)"
-            accept="image/*"
-            class="shadow appearance-none border rounded w-full py-2 px-3 text-green-700 focus:outline-none focus:shadow-outline"
-          />
+          <div
+            class="flex flex-col items-center justify-center w-full p-4 border-2 border-dashed rounded-lg border-green-500 hover:bg-green-50 cursor-pointer"
+            (click)="fileInput.click()"
+            (dragover)="onDragOver($event)"
+            (dragleave)="onDragLeave($event)"
+            (drop)="onDrop($event)"
+          >
+            <p class="text-green-700">Drag & drop an image here, or click to select one</p>
+            <input
+              #fileInput
+              id="profilePicture"
+              type="file"
+              accept="image/*"
+              (change)="onFileSelected($event)"
+              class="hidden"
+            />
+          </div>
           <div *ngIf="selectedFileName" class="text-green-700 text-sm mt-1">
             Selected File: {{ selectedFileName }}
           </div>
         </div>
+
 
         <!-- Submit Button -->
         <div class="flex items-center justify-center">

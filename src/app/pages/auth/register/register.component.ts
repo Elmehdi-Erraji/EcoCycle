@@ -58,7 +58,7 @@ export class RegisterComponent implements OnInit {
     });
   }
 
-  // Called when the user selects a file
+  // Called when the user selects a file via input or drag & drop.
   onFileSelected(event: any): void {
     const file: File = event.target.files[0];
     if (file) {
@@ -71,6 +71,31 @@ export class RegisterComponent implements OnInit {
         });
       };
       reader.readAsDataURL(file);
+    }
+  }
+
+  // Handle drag over event.
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    // Optionally, add a visual cue to indicate an active drop zone.
+  }
+
+  // Handle drag leave event.
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    // Optionally, remove the visual cue.
+  }
+
+  // Handle drop event.
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    if (event.dataTransfer && event.dataTransfer.files && event.dataTransfer.files.length > 0) {
+      // Process the first file dropped.
+      this.onFileSelected({ target: { files: event.dataTransfer.files } });
+      event.dataTransfer.clearData();
     }
   }
 
