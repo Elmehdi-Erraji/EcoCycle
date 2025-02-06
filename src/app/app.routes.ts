@@ -9,6 +9,7 @@ import {RoleGuard} from './core/guards/role.guard';
 import {NavbarComponent} from './shared/navbar/navbar.component';
 import {DashComponent} from './pages/dashboard/individual/dash/dash.component';
 import {DashComponent1} from './pages/dashboard/collector/dash/dash1.component';
+import {CollectsComponent} from './pages/dashboard/collector/collects/collects.component';
 
 export const routes: Routes = [
   {path: "", component: HomeComponent},
@@ -26,6 +27,7 @@ export const routes: Routes = [
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: DashComponent1 },
+      {path: 'myCollections', component: CollectsComponent},
     ]
   },
   {

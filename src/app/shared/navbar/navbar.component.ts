@@ -7,7 +7,7 @@ import { User } from '../../core/models/user.model';
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [RouterOutlet, NgIf, RouterLink, RouterLinkActive],
+  imports: [RouterOutlet, NgIf, RouterLink],
   templateUrl: './navbar.component.html',
   styleUrls: ['./navbar.component.css']
 })
