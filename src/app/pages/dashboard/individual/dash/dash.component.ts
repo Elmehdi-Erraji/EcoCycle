@@ -1,9 +1,9 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { Request } from '../../../../core/models/request.model';
 import { RequestService } from '../../../../core/services/request.service';
 import { AuthService } from '../../../../core/services/auth-service.service';
-import { Request } from '../../../../core/models/request.model';
 import { Subscription } from 'rxjs';
 import Swal from 'sweetalert2';
 
@@ -39,9 +39,9 @@ export class DashComponent implements OnInit, OnDestroy {
   // Subscription to requests
   private subscription!: Subscription;
 
-  // "New Request" form data (Partial, but ensure wasteItems is an array)
+  // "New Request" form data
   newRequest: Partial<Request> = {
-    wasteItems: [], // always initialize with empty array
+    wasteItems: [],
     photos: [],
     address: '',
     date: '',
@@ -57,10 +57,10 @@ export class DashComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
-      this.userId = currentUser.email; // example: using user's email as ID
-
+      this.userId = currentUser.email;
       // Subscribe to the BehaviorSubject in RequestService
       this.subscription = this.requestService.requests$.subscribe(requests => {
+        // Filter only the requests that belong to the current user
         this.requests = requests.filter(req => req.userId === this.userId);
         this.totalRequests = this.requests.length;
         this.calculateScore();
@@ -74,9 +74,58 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
+  // Calculate the score based on the conversion rules for each validated request.
   calculateScore(): void {
-    // e.g., each validated request is worth 10 points
-    this.myScore = this.requests.filter(req => req.status === 'validated').length * 10;
+    let score = 0;
+    for (const req of this.requests.filter(r => r.status === 'validated')) {
+      if (req.wasteItems && req.wasteItems.length > 0) {
+        for (const item of req.wasteItems) {
+          const weightKg = item.weight / 1000;
+          let rate = 0;
+          switch (item.type.toLowerCase().trim()) {
+            case 'plastique':
+              rate = 2;
+              break;
+            case 'verre':
+              rate = 1;
+              break;
+            case 'papier':
+              rate = 1;
+              break;
+            case 'métal':
+            case 'metal':
+              rate = 5;
+              break;
+            default:
+              rate = 0;
+          }
+          score += Math.round(weightKg * rate);
+        }
+      } else if ((req as any).weight && (req as any).type) {
+        // Fallback if wasteItems are not in an array.
+        const weightKg = (req as any).weight / 1000;
+        let rate = 0;
+        switch ((req as any).type.toLowerCase().trim()) {
+          case 'plastique':
+            rate = 2;
+            break;
+          case 'verre':
+            rate = 1;
+            break;
+          case 'papier':
+            rate = 1;
+            break;
+          case 'métal':
+          case 'metal':
+            rate = 5;
+            break;
+          default:
+            rate = 0;
+        }
+        score += Math.round(weightKg * rate);
+      }
+    }
+    this.myScore = score;
   }
 
   /**
@@ -88,16 +137,13 @@ export class DashComponent implements OnInit, OnDestroy {
 
   /**
    * Returns requests filtered by the user's search text.
-   * Checking waste types and address fields.
    */
   get filteredRequests(): Request[] {
     if (!this.searchText) {
       return this.requests;
     }
     const lowerSearch = this.searchText.toLowerCase();
-
     return this.requests.filter(req => {
-      // Combine all waste items' types into a string
       const wasteTypes = req.wasteItems.map(item => item.type).join(' ');
       const haystack = (wasteTypes + ' ' + req.address).toLowerCase();
       return haystack.includes(lowerSearch);
@@ -108,9 +154,8 @@ export class DashComponent implements OnInit, OnDestroy {
   // ADD REQUEST
   // ======================================
   openAddModal(): void {
-    // Reset the form data each time we open
     this.newRequest = {
-      wasteItems: [{ type: '', weight: 1000 }], // start with one line
+      wasteItems: [{ type: '', weight: 1000 }],
       photos: [],
       address: '',
       date: '',
@@ -128,7 +173,7 @@ export class DashComponent implements OnInit, OnDestroy {
     if (!this.validateAddForm()) return;
 
     const request: Request = {
-      id: 0, // will be assigned by service
+      id: 0, // ID will be assigned by the RequestService
       userId: this.userId,
       wasteItems: this.newRequest.wasteItems || [],
       photos: this.newRequest.photos || [],
@@ -160,7 +205,6 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  // Remove an item from newRequest.wasteItems
   removeWasteItem(index: number): void {
     if (this.newRequest.wasteItems) {
       this.newRequest.wasteItems.splice(index, 1);
@@ -171,7 +215,6 @@ export class DashComponent implements OnInit, OnDestroy {
   // EDIT REQUEST
   // ======================================
   openEditModal(req: Request): void {
-    // Make a copy so we don't mutate the original while editing
     this.currentRequest = JSON.parse(JSON.stringify(req));
     this.isEditModalOpen = true;
   }
@@ -249,7 +292,6 @@ export class DashComponent implements OnInit, OnDestroy {
     const files: FileList = event.target.files;
     if (!files) return;
 
-    // Ensure photos array exists
     if (!this.newRequest.photos) {
       this.newRequest.photos = [];
     }
@@ -276,18 +318,12 @@ export class DashComponent implements OnInit, OnDestroy {
 
     for (const item of this.newRequest.wasteItems) {
       if (!item.type || !item.weight || item.weight < 1000) {
-        this.showValidationError(
-          'Each waste item must have a type and weight >= 1000g.'
-        );
+        this.showValidationError('Each waste item must have a type and weight >= 1000g.');
         return false;
       }
     }
 
-    if (
-      !this.newRequest.address ||
-      !this.newRequest.date ||
-      !this.newRequest.timeSlot
-    ) {
+    if (!this.newRequest.address || !this.newRequest.date || !this.newRequest.timeSlot) {
       this.showValidationError('Please fill all required fields.');
       return false;
     }

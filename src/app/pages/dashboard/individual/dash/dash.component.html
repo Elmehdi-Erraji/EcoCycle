@@ -241,12 +241,12 @@
     (click)="closeEditModal()"
   >
     <div
-      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300"
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 max-h-[90vh] overflow-y-auto"
       (click)="$event.stopPropagation()"
       [ngClass]="{
-        'opacity-100 translate-y-0': isEditModalOpen,
-        'opacity-0 -translate-y-10': !isEditModalOpen
-      }"
+      'opacity-100 translate-y-0': isEditModalOpen,
+      'opacity-0 -translate-y-10': !isEditModalOpen
+    }"
     >
       <h2 class="text-2xl font-bold mb-4 text-gray-800">
         Edit Request #{{ currentRequest?.id }}
@@ -273,25 +273,25 @@
             class="w-full px-3 py-2 border rounded focus:border-green-500"
           />
 
-          <!-- If you want to allow removing items in edit mode, add a method in TS:
-               removeWasteItemEdit(index: number): void { ... }
-               Then (click)="removeWasteItemEdit(i)"
-          -->
+          <!-- Optionally, include a button to remove waste items -->
+          <!-- <button (click)="removeWasteItemEdit(i)" class="mt-2 text-red-600">Remove</button> -->
         </div>
 
-        <!-- If you want to add new items in edit mode:
-          <button
-            class="bg-gray-200 border border-gray-300 text-gray-700 py-1 px-2 rounded"
-            (click)="currentRequest!.wasteItems.push({ type: '', weight: 1000 })"
-          >
-            + Add Another Item
-          </button>
+        <!-- Optionally, add a button for adding new waste items in edit mode -->
+        <!--
+        <button
+          class="bg-gray-200 border border-gray-300 text-gray-700 py-1 px-2 rounded"
+          (click)="currentRequest.wasteItems.push({ type: '', weight: 1000 })"
+        >
+          + Add Another Item
+        </button>
         -->
 
-        <!-- If you also want to allow new photo uploads in Edit mode:
+        <!-- Optional: New Photo Upload Section for Edit Mode -->
+        <!--
         <div class="mt-4">
           <label class="block text-gray-700">Upload New Images</label>
-          <input type="file" multiple accept="image/*" (change)="yourEditFileHandler($event)" />
+          <input type="file" multiple accept="image/*" (change)="yourEditFileHandler($event)" class="mt-1" />
         </div>
         -->
 
