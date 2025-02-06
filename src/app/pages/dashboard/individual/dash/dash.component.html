@@ -67,7 +67,7 @@
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
       <tr *ngFor="let req of filteredRequests" class="transition hover:bg-gray-50">
-        <td class="px-6 py-4 whitespace-nowrap">{{ req.id }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">#</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.type }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.weight }}</td>
         <td class="px-6 py-4 whitespace-nowrap">{{ req.address }}</td>
@@ -130,12 +130,16 @@
       <div class="space-y-4">
         <div>
           <label class="block text-gray-700">Type of Waste</label>
-          <input
-            type="text"
+          <select
             [(ngModel)]="newRequest.type"
             class="w-full px-3 py-2 border rounded focus:border-green-500"
-            placeholder="e.g., Plastique, Verre"
-          />
+          >
+            <option value="" disabled selected>Select type</option>
+            <option value="plastique">Plastique</option>
+            <option value="verre">Verre</option>
+            <option value="papier">Papier</option>
+            <option value="métal">Métal</option>
+          </select>
         </div>
         <div>
           <label class="block text-gray-700">Estimated Weight (g)</label>
@@ -219,12 +223,18 @@
       <div class="space-y-4" *ngIf="currentRequest">
         <div>
           <label class="block text-gray-700">Type of Waste</label>
-          <input
-            type="text"
+          <select
             [(ngModel)]="currentRequest.type"
             class="w-full px-3 py-2 border rounded focus:border-green-500"
-          />
+          >
+            <option value="" disabled>Select type</option>
+            <option value="plastique">Plastique</option>
+            <option value="verre">Verre</option>
+            <option value="papier">Papier</option>
+            <option value="métal">Métal</option>
+          </select>
         </div>
+
         <div>
           <label class="block text-gray-700">Estimated Weight (g)</label>
           <input
