@@ -1,0 +1,404 @@
+<div class="p-6 space-y-8 bg-gray-50">
+  <!-- Summary Cards (unchanged) -->
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div
+      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
+    >
+      <div class="p-6">
+        <span class="material-icons text-green-600 text-5xl">assignment</span>
+      </div>
+      <div class="ml-4 py-4 pr-6">
+        <h2 class="text-lg font-semibold text-gray-700">My Requests</h2>
+        <p class="text-3xl font-extrabold text-green-700">{{ totalRequests }}</p>
+      </div>
+    </div>
+
+    <div
+      class="relative flex items-center rounded-xl overflow-hidden shadow transition transform hover:scale-[1.01] bg-gradient-to-br from-green-100 to-green-50"
+    >
+      <div class="p-6">
+        <span class="material-icons text-green-600 text-5xl">star</span>
+      </div>
+      <div class="ml-4 py-4 pr-6">
+        <h2 class="text-lg font-semibold text-gray-700">My Score</h2>
+        <p class="text-3xl font-extrabold text-green-700">{{ myScore }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Table Controls (unchanged) -->
+  <div class="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+    <div class="flex items-center space-x-4">
+      <div class="relative">
+        <span class="material-icons absolute left-2 top-2.5 text-gray-400">search</span>
+        <input
+          type="text"
+          [(ngModel)]="searchText"
+          placeholder="Search requests..."
+          class="w-64 pl-9 pr-4 py-2 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-green-500 transition-all duration-200"
+        />
+      </div>
+    </div>
+
+    <button
+      (click)="openAddModal()"
+      class="flex items-center bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded transition-colors duration-200 shadow"
+    >
+      <span class="material-icons mr-2 text-white">add</span>
+      Add Request
+    </button>
+  </div>
+
+  <!-- Requests Table -->
+  <div class="overflow-x-auto bg-white shadow rounded-lg mt-4">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead>
+      <tr class="bg-green-100">
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">ID</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Waste Items</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Total Weight (g)</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Address</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Date</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Time Slot</th>
+        <th class="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-3 text-center text-xs font-semibold text-gray-700 uppercase tracking-wider">Actions</th>
+      </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+      <tr *ngFor="let req of filteredRequests" class="transition hover:bg-gray-50">
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.id }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span *ngFor="let item of req.wasteItems; let last = last">
+              {{ item.type }} ({{ item.weight }}g)<span *ngIf="!last">, </span>
+            </span>
+        </td>
+        <!-- Use the helper method getTotalWeight(req) -->
+        <td class="px-6 py-4 whitespace-nowrap">
+          {{ getTotalWeight(req) }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.address }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.date }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">{{ req.timeSlot }}</td>
+        <td class="px-6 py-4 whitespace-nowrap">
+            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+              {{ req.status }}
+            </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-center">
+          <div class="flex justify-center items-center space-x-3">
+            <button
+              (click)="openEditModal(req)"
+              class="text-blue-600 hover:text-blue-800"
+              title="Edit"
+            >
+              <span class="material-icons text-base">edit</span>
+            </button>
+            <button
+              (click)="deleteRequest(req)"
+              class="text-red-600 hover:text-red-800"
+              title="Delete"
+            >
+              <span class="material-icons text-base">delete</span>
+            </button>
+            <button
+              (click)="openShowModal(req)"
+              class="text-green-600 hover:text-green-800"
+              title="Show"
+            >
+              <span class="material-icons text-base">visibility</span>
+            </button>
+          </div>
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add Request Modal -->
+  <!-- Add Request Modal -->
+  <div
+    *ngIf="isAddModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeAddModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+      'opacity-100 translate-y-0': isAddModalOpen,
+      'opacity-0 -translate-y-10': !isAddModalOpen
+    }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">Add New Request</h2>
+
+      <!-- MULTIPLE WASTE ITEMS -->
+      <div *ngFor="let item of newRequest.wasteItems; let i = index" class="mb-4 border p-4">
+        <label class="block text-gray-700">Type of Waste</label>
+        <select
+          [(ngModel)]="item.type"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+        >
+          <option value="" disabled>Select type</option>
+          <option value="plastique">Plastique</option>
+          <option value="verre">Verre</option>
+          <option value="papier">Papier</option>
+          <option value="métal">Métal</option>
+        </select>
+
+        <label class="block text-gray-700 mt-2">Estimated Weight (g)</label>
+        <input
+          type="number"
+          [(ngModel)]="item.weight"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+        />
+
+        <!-- Remove item button (using a helper method) -->
+        <button
+          *ngIf="(newRequest.wasteItems?.length || 0) > 1"
+          class="mt-2 text-red-600"
+          (click)="removeWasteItem(i)"
+        >
+          Remove
+        </button>
+      </div>
+
+      <!-- Add Another Item -->
+      <button
+        class="bg-gray-200 border border-gray-300 text-gray-700 py-1 px-2 rounded"
+        (click)="newRequest.wasteItems?.push({ type: '', weight: 1000 })"
+      >
+        + Add Another Item
+      </button>
+
+      <!-- PHOTO UPLOAD -->
+      <div class="mt-4">
+        <label class="block text-gray-700">Upload Images</label>
+        <input
+          type="file"
+          (change)="onFileSelected($event)"
+          multiple
+          accept="image/*"
+          class="mt-1"
+        />
+      </div>
+
+      <!-- Other fields -->
+      <div class="mt-4">
+        <label class="block text-gray-700">Collection Address</label>
+        <input
+          type="text"
+          [(ngModel)]="newRequest.address"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+        />
+      </div>
+      <div class="mt-4">
+        <label class="block text-gray-700">Date</label>
+        <input
+          type="date"
+          [(ngModel)]="newRequest.date"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+        />
+      </div>
+      <div class="mt-4">
+        <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
+        <input
+          type="text"
+          [(ngModel)]="newRequest.timeSlot"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+          placeholder="e.g. 09:00-12:00"
+        />
+      </div>
+      <div class="mt-4">
+        <label class="block text-gray-700">Additional Notes</label>
+        <textarea
+          [(ngModel)]="newRequest.notes"
+          class="w-full px-3 py-2 border rounded focus:border-green-500"
+        ></textarea>
+      </div>
+
+      <div class="flex justify-end space-x-4 mt-6">
+        <button
+          (click)="closeAddModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="addRequest()"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Submit
+        </button>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- Edit Request Modal -->
+  <div
+    *ngIf="isEditModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeEditModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300 max-h-[90vh] overflow-y-auto"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+      'opacity-100 translate-y-0': isEditModalOpen,
+      'opacity-0 -translate-y-10': !isEditModalOpen
+    }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Edit Request #{{ currentRequest?.id }}
+      </h2>
+      <div class="space-y-4" *ngIf="currentRequest">
+        <!-- WASTE ITEMS (Edit) -->
+        <div *ngFor="let item of currentRequest.wasteItems; let i = index" class="mb-4 border p-4">
+          <label class="block text-gray-700">Type of Waste</label>
+          <select
+            [(ngModel)]="item.type"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          >
+            <option value="" disabled>Select type</option>
+            <option value="plastique">Plastique</option>
+            <option value="verre">Verre</option>
+            <option value="papier">Papier</option>
+            <option value="métal">Métal</option>
+          </select>
+
+          <label class="block text-gray-700 mt-2">Weight (g)</label>
+          <input
+            type="number"
+            [(ngModel)]="item.weight"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+
+          <!-- Optionally, include a button to remove waste items -->
+          <!-- <button (click)="removeWasteItemEdit(i)" class="mt-2 text-red-600">Remove</button> -->
+        </div>
+
+        <!-- Optionally, add a button for adding new waste items in edit mode -->
+        <!--
+        <button
+          class="bg-gray-200 border border-gray-300 text-gray-700 py-1 px-2 rounded"
+          (click)="currentRequest.wasteItems.push({ type: '', weight: 1000 })"
+        >
+          + Add Another Item
+        </button>
+        -->
+
+        <!-- Optional: New Photo Upload Section for Edit Mode -->
+        <!--
+        <div class="mt-4">
+          <label class="block text-gray-700">Upload New Images</label>
+          <input type="file" multiple accept="image/*" (change)="yourEditFileHandler($event)" class="mt-1" />
+        </div>
+        -->
+
+        <div>
+          <label class="block text-gray-700">Collection Address</label>
+          <input
+            type="text"
+            [(ngModel)]="currentRequest.address"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Date</label>
+          <input
+            type="date"
+            [(ngModel)]="currentRequest.date"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Time Slot (09:00-18:00)</label>
+          <input
+            type="text"
+            [(ngModel)]="currentRequest.timeSlot"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          />
+        </div>
+        <div>
+          <label class="block text-gray-700">Additional Notes</label>
+          <textarea
+            [(ngModel)]="currentRequest.notes"
+            class="w-full px-3 py-2 border rounded focus:border-green-500"
+          ></textarea>
+        </div>
+      </div>
+      <div class="flex justify-end space-x-4 mt-6">
+        <button
+          (click)="closeEditModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Cancel
+        </button>
+        <button
+          (click)="updateRequest()"
+          class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded"
+        >
+          Save Changes
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Show Request Modal -->
+  <div
+    *ngIf="isShowModalOpen"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-40"
+    (click)="closeShowModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-lg p-6 w-full max-w-md transform transition-all duration-300"
+      (click)="$event.stopPropagation()"
+      [ngClass]="{
+        'opacity-100 translate-y-0': isShowModalOpen,
+        'opacity-0 -translate-y-10': !isShowModalOpen
+      }"
+    >
+      <h2 class="text-2xl font-bold mb-4 text-gray-800">
+        Request Details #{{ currentRequest?.id }}
+      </h2>
+      <div class="space-y-4 text-gray-700" *ngIf="currentRequest">
+        <p>
+          <strong>Waste Items:</strong>
+          <span *ngFor="let item of currentRequest.wasteItems; let last = last">
+            {{ item.type }} ({{ item.weight }}g)<span *ngIf="!last">, </span>
+          </span>
+        </p>
+        <p>
+          <strong>Total Weight:</strong>
+          {{ getTotalWeight(currentRequest) }}g
+        </p>
+        <p><strong>Address:</strong> {{ currentRequest.address }}</p>
+        <p><strong>Date:</strong> {{ currentRequest.date }}</p>
+        <p><strong>Time Slot:</strong> {{ currentRequest.timeSlot }}</p>
+        <p><strong>Status:</strong> {{ currentRequest.status }}</p>
+        <p><strong>Notes:</strong> {{ currentRequest.notes || 'N/A' }}</p>
+
+        <!-- Show images (if any) -->
+        <div *ngIf="currentRequest.photos?.length">
+          <strong>Photos:</strong>
+          <div class="flex flex-wrap mt-2">
+            <div
+              *ngFor="let photo of currentRequest.photos"
+              class="mr-2 mb-2"
+            >
+              <img [src]="photo" class="w-20 h-20 object-cover rounded" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="flex justify-end mt-6">
+        <button
+          (click)="closeShowModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,133 @@
+<div class="p-6 space-y-6 bg-gray-50">
+  <h2 class="text-2xl font-bold text-gray-800 mb-4">Available Collection Requests</h2>
+
+  <!-- No requests message -->
+  <div *ngIf="requests.length === 0" class="text-gray-600 text-center">
+    No collection requests in your area.
+  </div>
+
+  <!-- Requests Grid -->
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="requests.length > 0">
+    <div
+      *ngFor="let request of requests"
+      class="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 cursor-pointer border border-gray-200"
+      (click)="openRequestModal(request)"
+    >
+      <div class="flex items-center justify-between mb-2">
+        <div class="flex items-center space-x-2">
+          <i class="fas fa-truck text-green-600"></i>
+          <h3 class="text-lg font-semibold text-green-700">
+            {{ getRequestType(request) }}
+          </h3>
+        </div>
+        <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700">
+          {{ request.status }}
+        </span>
+      </div>
+
+      <p class="text-gray-600 mt-1">
+        <strong>Weight:</strong> {{ getRequestWeight(request) }}g
+      </p>
+      <p class="text-gray-600 mt-1">
+        <strong>Address:</strong> {{ request.address }}
+      </p>
+      <p class="text-gray-500 text-sm mt-1">
+        {{ request.date }} | {{ request.timeSlot }}
+      </p>
+
+      <!-- Show image if available; otherwise nothing is displayed -->
+      <div *ngIf="request.photos && request.photos.length" class="mt-2">
+        <img
+          [src]="request.photos[0]"
+          alt="Request photo"
+          class="w-full h-32 object-cover rounded-lg shadow-sm"
+        />
+      </div>
+    </div>
+  </div>
+
+  <!-- Request Details Modal -->
+  <div
+    *ngIf="selectedRequest"
+    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+    (click)="closeRequestModal()"
+  >
+    <div
+      class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md relative"
+      (click)="$event.stopPropagation()"
+    >
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Request Details</h2>
+
+      <!-- If the request has multiple waste items, list each one -->
+      <div *ngIf="selectedRequest.wasteItems && selectedRequest.wasteItems.length > 0; else singleItem">
+        <div *ngFor="let item of selectedRequest.wasteItems" class="mb-2 border-b pb-1">
+          <p class="text-gray-600">
+            <strong>Type:</strong> {{ item.type }}
+          </p>
+          <p class="text-gray-600">
+            <strong>Weight:</strong> {{ item.weight }}g
+          </p>
+        </div>
+      </div>
+      <ng-template #singleItem>
+        <p class="text-gray-600 mb-2">
+          <strong>Type:</strong> {{ getRequestType(selectedRequest) }}
+        </p>
+        <p class="text-gray-600 mb-2">
+          <strong>Weight:</strong> {{ getRequestWeight(selectedRequest) }}g
+        </p>
+      </ng-template>
+
+      <p class="text-gray-600 mb-2">
+        <strong>Address:</strong> {{ selectedRequest.address }}
+      </p>
+      <p class="text-gray-600 mb-2">
+        <strong>Date:</strong> {{ selectedRequest.date }}
+      </p>
+      <p class="text-gray-600 mb-2">
+        <strong>Time Slot:</strong> {{ selectedRequest.timeSlot }}
+      </p>
+      <p class="text-gray-600 mb-4">
+        <strong>Status:</strong> {{ selectedRequest.status }}
+      </p>
+
+      <!-- Photos section -->
+      <div *ngIf="selectedRequest.photos?.length; else noPhotos" class="mt-4">
+        <h3 class="text-lg font-semibold text-gray-700 mb-2">Photos</h3>
+        <div class="grid grid-cols-2 gap-2">
+          <img
+            *ngFor="let photo of selectedRequest.photos"
+            [src]="photo"
+            alt="Waste Image"
+            class="w-full h-32 object-cover rounded-lg shadow-md"
+          />
+        </div>
+      </div>
+      <ng-template #noPhotos>
+        <p class="text-gray-500 italic mt-4">No images attached.</p>
+      </ng-template>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-end mt-6 space-x-4">
+        <button
+          (click)="closeRequestModal()"
+          class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded"
+        >
+          Close
+        </button>
+        <button
+          (click)="rejectRequest(selectedRequest)"
+          class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Reject Request
+        </button>
+        <button
+          (click)="acceptRequest(selectedRequest)"
+          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+        >
+          Accept Request
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
