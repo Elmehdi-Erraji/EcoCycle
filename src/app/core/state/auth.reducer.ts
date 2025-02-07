@@ -21,6 +21,13 @@ export const authReducer = createReducer(
     loading: true,
     error: null
   })),
+  on(AuthActions.refreshUserData, (state) => {
+    const userData = localStorage.getItem('currentUser');
+    return {
+      ...state,
+      user: userData ? JSON.parse(userData) : null
+    };
+  }),
   on(AuthActions.loginSuccess, (state, { user }) => ({
     ...state,
     user,

@@ -1,0 +1,79 @@
+<div class="p-6 bg-gray-50">
+  <h2 class="text-2xl font-bold text-green-800 mb-4">My Coupons & Points</h2>
+
+  <!-- Display Current User Score -->
+  <div class="mb-6">
+    <p class="text-lg">
+      Your Current Score: <span class="font-bold">{{ userScore }}</span> points
+    </p>
+  </div>
+
+  <!-- Conversion Options -->
+  <div class="space-y-4">
+    <!-- Option 1: 100 points → 50 Dh coupon -->
+    <div class="p-4 border rounded-lg bg-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-lg font-semibold">50 Dh Coupon</p>
+          <p class="text-sm text-gray-500">Requires 100 points</p>
+        </div>
+        <button
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          (click)="createCoupon(100)"
+        >
+          Create Coupon
+        </button>
+      </div>
+    </div>
+
+    <!-- Option 2: 200 points → 120 Dh coupon -->
+    <div class="p-4 border rounded-lg bg-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-lg font-semibold">120 Dh Coupon</p>
+          <p class="text-sm text-gray-500">Requires 200 points</p>
+        </div>
+        <button
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          (click)="createCoupon(200)"
+        >
+          Create Coupon
+        </button>
+      </div>
+    </div>
+
+    <!-- Option 3: 500 points → 350 Dh coupon -->
+    <div class="p-4 border rounded-lg bg-white">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-lg font-semibold">350 Dh Coupon</p>
+          <p class="text-sm text-gray-500">Requires 500 points</p>
+        </div>
+        <button
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          (click)="createCoupon(500)"
+        >
+          Create Coupon
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Display Created Coupons -->
+  <div class="mt-8">
+    <h3 class="text-xl font-bold text-green-800 mb-4">Your Coupons</h3>
+    <div *ngIf="coupons.length > 0; else noCoupons">
+      <ul class="space-y-2">
+        <li *ngFor="let coupon of coupons" class="p-4 border rounded-lg bg-white">
+          <p class="font-semibold">{{ coupon.value }} Dh Coupon</p>
+          <p class="text-sm text-gray-500">
+            Created on: {{ coupon.createdAt | date:'short' }}
+          </p>
+        </li>
+      </ul>
+    </div>
+    <ng-template #noCoupons>
+      <p class="text-gray-500">No coupons created yet.</p>
+    </ng-template>
+  </div>
+</div>

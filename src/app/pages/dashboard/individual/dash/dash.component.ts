@@ -17,7 +17,7 @@ import Swal from 'sweetalert2';
 export class DashComponent implements OnInit, OnDestroy {
   // Summary fields
   totalRequests = 0;
-  myScore = 0;
+  myScore = 0; // Now read directly from the current user
 
   // Current user info
   userId: string = '';
@@ -58,12 +58,15 @@ export class DashComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.userId = currentUser.email;
+      // Directly assign the user's score from the current user object.
+      this.myScore = currentUser.score ?? 0;
+
       // Subscribe to the BehaviorSubject in RequestService
       this.subscription = this.requestService.requests$.subscribe(requests => {
         // Filter only the requests that belong to the current user
         this.requests = requests.filter(req => req.userId === this.userId);
         this.totalRequests = this.requests.length;
-        this.calculateScore();
+        // Removed call to calculateScore() since the score is managed elsewhere.
       });
     }
   }
@@ -72,60 +75,6 @@ export class DashComponent implements OnInit, OnDestroy {
     if (this.subscription) {
       this.subscription.unsubscribe();
     }
-  }
-
-  // Calculate the score based on the conversion rules for each validated request.
-  calculateScore(): void {
-    let score = 0;
-    for (const req of this.requests.filter(r => r.status === 'validated')) {
-      if (req.wasteItems && req.wasteItems.length > 0) {
-        for (const item of req.wasteItems) {
-          const weightKg = item.weight / 1000;
-          let rate = 0;
-          switch (item.type.toLowerCase().trim()) {
-            case 'plastique':
-              rate = 2;
-              break;
-            case 'verre':
-              rate = 1;
-              break;
-            case 'papier':
-              rate = 1;
-              break;
-            case 'métal':
-            case 'metal':
-              rate = 5;
-              break;
-            default:
-              rate = 0;
-          }
-          score += Math.round(weightKg * rate);
-        }
-      } else if ((req as any).weight && (req as any).type) {
-        // Fallback if wasteItems are not in an array.
-        const weightKg = (req as any).weight / 1000;
-        let rate = 0;
-        switch ((req as any).type.toLowerCase().trim()) {
-          case 'plastique':
-            rate = 2;
-            break;
-          case 'verre':
-            rate = 1;
-            break;
-          case 'papier':
-            rate = 1;
-            break;
-          case 'métal':
-          case 'metal':
-            rate = 5;
-            break;
-          default:
-            rate = 0;
-        }
-        score += Math.round(weightKg * rate);
-      }
-    }
-    this.myScore = score;
   }
 
   /**
@@ -215,6 +164,7 @@ export class DashComponent implements OnInit, OnDestroy {
   // EDIT REQUEST
   // ======================================
   openEditModal(req: Request): void {
+    // Create a deep copy of the request to edit.
     this.currentRequest = JSON.parse(JSON.stringify(req));
     this.isEditModalOpen = true;
   }

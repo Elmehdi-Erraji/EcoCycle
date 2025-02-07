@@ -1,14 +1,19 @@
 import { Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
-// Import the dedicated User model
+import { Store } from '@ngrx/store';  // Import the Store
 import { User } from '../models/user.model';
+import { refreshUserData } from '../state/auth.actions';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
-  constructor(private router: Router, private http: HttpClient) {
+  constructor(
+    private router: Router,
+    private http: HttpClient,
+    private store: Store  // Inject the Store here
+  ) {
     // Load dummy collectors from JSON if not already in local storage
     this.initializeCollectors();
   }
@@ -62,6 +67,7 @@ export class AuthService {
     let user = users.find(u => u.email === email && u.password === password);
     if (user) {
       localStorage.setItem('currentUser', JSON.stringify(user));
+      this.store.dispatch(refreshUserData());
       return true;
     }
 
@@ -70,6 +76,7 @@ export class AuthService {
     user = collectors.find(u => u.email === email && u.password === password);
     if (user) {
       localStorage.setItem('currentUser', JSON.stringify(user));
+      this.store.dispatch(refreshUserData());
       return true;
     }
 
