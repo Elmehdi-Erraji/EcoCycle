@@ -1,3 +1,4 @@
+<!-- dash1.component.html -->
 <div class="p-6 space-y-6 bg-gray-50">
   <h2 class="text-2xl font-bold text-gray-800 mb-4">Available Collection Requests</h2>
 
@@ -10,7 +11,7 @@
   <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" *ngIf="requests.length > 0">
     <div
       *ngFor="let request of requests"
-      class="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 cursor-pointer border border-gray-200"
+      class="bg-white shadow-lg rounded-lg p-4 transition-transform transform hover:scale-105 hover:ring-2 hover:ring-blue-200 cursor-pointer border border-gray-200"
       (click)="openRequestModal(request)"
     >
       <div class="flex items-center justify-between mb-2">
@@ -20,8 +21,18 @@
             {{ getRequestType(request) }}
           </h3>
         </div>
-        <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700">
-          {{ request.status }}
+        <!-- Conditional status label -->
+        <span
+          [ngClass]="{
+            'px-3 py-1 text-sm rounded-full': true,
+            'bg-yellow-100 text-yellow-700': request.status === 'pending',
+            'bg-blue-100 text-blue-700': request.status === 'reserved',
+            'bg-indigo-100 text-indigo-700': request.status === 'ongoing',
+            'bg-green-500 text-white': request.status === 'validated',
+            'bg-red-100 text-red-700': request.status === 'rejected'
+          }"
+        >
+          {{ request.status | titlecase }}
         </span>
       </div>
 
@@ -35,12 +46,12 @@
         {{ request.date }} | {{ request.timeSlot }}
       </p>
 
-      <!-- Show image if available; otherwise nothing is displayed -->
-      <div *ngIf="request.photos && request.photos.length" class="mt-2">
+      <!-- Show image if available -->
+      <div *ngIf="request.photos && request.photos.length" class="mt-2 overflow-hidden rounded-lg">
         <img
           [src]="request.photos[0]"
           alt="Request photo"
-          class="w-full h-32 object-cover rounded-lg shadow-sm"
+          class="w-full h-32 object-cover"
         />
       </div>
     </div>
@@ -58,7 +69,7 @@
     >
       <h2 class="text-2xl font-bold text-gray-800 mb-4">Request Details</h2>
 
-      <!-- If the request has multiple waste items, list each one -->
+      <!-- Waste items details -->
       <div *ngIf="selectedRequest.wasteItems && selectedRequest.wasteItems.length > 0; else singleItem">
         <div *ngFor="let item of selectedRequest.wasteItems" class="mb-2 border-b pb-1">
           <p class="text-gray-600">
@@ -87,8 +98,21 @@
       <p class="text-gray-600 mb-2">
         <strong>Time Slot:</strong> {{ selectedRequest.timeSlot }}
       </p>
-      <p class="text-gray-600 mb-4">
-        <strong>Status:</strong> {{ selectedRequest.status }}
+      <!-- Status display with conditional styling -->
+      <p class="mb-4">
+        <strong>Status:</strong>
+        <span
+          [ngClass]="{
+            'px-3 py-1 text-sm rounded-full': true,
+            'bg-yellow-100 text-yellow-700': selectedRequest.status === 'pending',
+            'bg-blue-100 text-blue-700': selectedRequest.status === 'reserved',
+            'bg-indigo-100 text-indigo-700': selectedRequest.status === 'ongoing',
+            'bg-green-500 text-white': selectedRequest.status === 'validated',
+            'bg-red-100 text-red-700': selectedRequest.status === 'rejected'
+          }"
+        >
+          {{ selectedRequest.status | titlecase }}
+        </span>
       </p>
 
       <!-- Photos section -->
@@ -121,12 +145,31 @@
         >
           Reject Request
         </button>
-        <button
-          (click)="acceptRequest(selectedRequest)"
-          class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
-        >
-          Accept Request
-        </button>
+
+        <!-- Conditionally show the appropriate action button -->
+        <ng-container [ngSwitch]="selectedRequest?.status">
+          <button
+            *ngSwitchCase="'pending'"
+            (click)="reserveRequest(selectedRequest)"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Reserve Request
+          </button>
+          <button
+            *ngSwitchCase="'reserved'"
+            (click)="startCollection(selectedRequest)"
+            class="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Start Collection
+          </button>
+          <button
+            *ngSwitchCase="'ongoing'"
+            (click)="completeCollection(selectedRequest)"
+            class="bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded"
+          >
+            Complete Collection
+          </button>
+        </ng-container>
       </div>
     </div>
   </div>
