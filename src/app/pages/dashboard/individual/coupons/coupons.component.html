@@ -11,15 +11,16 @@
   <!-- Conversion Options -->
   <div class="space-y-4">
     <!-- Option 1: 100 points → 50 Dh coupon -->
-    <div class="p-4 border rounded-lg bg-white">
+    <div class="p-4 border rounded-lg bg-white shadow-sm">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-lg font-semibold">50 Dh Coupon</p>
           <p class="text-sm text-gray-500">Requires 100 points</p>
         </div>
         <button
-          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
           (click)="createCoupon(100)"
+          [disabled]="userScore < 100"
         >
           Create Coupon
         </button>
@@ -27,15 +28,16 @@
     </div>
 
     <!-- Option 2: 200 points → 120 Dh coupon -->
-    <div class="p-4 border rounded-lg bg-white">
+    <div class="p-4 border rounded-lg bg-white shadow-sm">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-lg font-semibold">120 Dh Coupon</p>
           <p class="text-sm text-gray-500">Requires 200 points</p>
         </div>
         <button
-          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
           (click)="createCoupon(200)"
+          [disabled]="userScore < 200"
         >
           Create Coupon
         </button>
@@ -43,15 +45,16 @@
     </div>
 
     <!-- Option 3: 500 points → 350 Dh coupon -->
-    <div class="p-4 border rounded-lg bg-white">
+    <div class="p-4 border rounded-lg bg-white shadow-sm">
       <div class="flex items-center justify-between">
         <div>
           <p class="text-lg font-semibold">350 Dh Coupon</p>
           <p class="text-sm text-gray-500">Requires 500 points</p>
         </div>
         <button
-          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 disabled:opacity-50"
           (click)="createCoupon(500)"
+          [disabled]="userScore < 500"
         >
           Create Coupon
         </button>
@@ -64,8 +67,11 @@
     <h3 class="text-xl font-bold text-green-800 mb-4">Your Coupons</h3>
     <div *ngIf="coupons.length > 0; else noCoupons">
       <ul class="space-y-2">
-        <li *ngFor="let coupon of coupons" class="p-4 border rounded-lg bg-white">
+        <li *ngFor="let coupon of coupons" class="p-4 border rounded-lg bg-white shadow-sm">
           <p class="font-semibold">{{ coupon.value }} Dh Coupon</p>
+          <p class="text-sm text-gray-500">
+            Code: <span class="font-mono">{{ coupon.code }}</span>
+          </p>
           <p class="text-sm text-gray-500">
             Created on: {{ coupon.createdAt | date:'short' }}
           </p>

@@ -1,3 +1,4 @@
+// collect.service.ts
 import { Injectable } from '@angular/core';
 import { Request, WasteItem } from '../models/request.model';
 import { User } from '../models/user.model';
@@ -18,66 +19,103 @@ export class CollectService {
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Get collector's city from the currentUser stored in local storage
-  private getCollectorCity(): string {
+  // Helper: Get the current logged-in user (collector)
+  private getCurrentUser(): User | null {
     const userData = localStorage.getItem(this.currentUserKey);
     if (userData) {
       try {
-        const currentUser: User = JSON.parse(userData);
-        return currentUser.address ? currentUser.address.trim() : '';
+        return JSON.parse(userData);
       } catch (error) {
         console.error('Error parsing currentUser from localStorage', error);
       }
     }
-    return '';
+    return null;
   }
 
-  // Return all requests in the collector's city that have a "pending" status
+  // Get collector's city from the currentUser stored in local storage
+  private getCollectorCity(): string {
+    const currentUser = this.getCurrentUser();
+    return currentUser && currentUser.address ? currentUser.address.trim() : '';
+  }
+
+  // Return all requests available to the collector.
+  // Available means pending OR reserved/ongoing (reserved by the current collector)
   getRequestsForCurrentUser(): Request[] {
     const collectorCity = this.getCollectorCity().toLowerCase().trim();
     const allRequests = this.getRequests();
-    return allRequests.filter(request =>
-      request.address &&
-      request.address.toLowerCase().includes(collectorCity) &&
-      request.status === 'pending'
-    );
+    const currentUser = this.getCurrentUser();
+    return allRequests.filter(request => {
+      if (!request.address || !request.address.toLowerCase().includes(collectorCity)) {
+        return false;
+      }
+      if (request.status === 'pending') {
+        return true;
+      }
+      if ((request.status === 'reserved' || request.status === 'ongoing') && currentUser) {
+        return request.reservedBy === currentUser.email;
+      }
+      return false;
+    });
   }
 
-  // Update the status of a given request in local storage
-  updateRequestStatus(requestId: number, newStatus: Request['status']): void {
+  // Reserve a pending request.
+  reserveRequest(requestId: number): void {
     const requests = this.getRequests();
-    const index = requests.findIndex(r => r.id === requestId);
-    if (index !== -1) {
-      requests[index].status = newStatus;
+    const request = requests.find(r => r.id === requestId);
+    const currentUser = this.getCurrentUser();
+    if (request && request.status === 'pending' && currentUser) {
+      request.status = 'reserved';
+      request.reservedBy = currentUser.email;
       localStorage.setItem(this.requestsKey, JSON.stringify(requests));
     }
   }
 
-  // Accept a pending request:
-  //   - Mark it as "validated" in local storage
-  //   - Award points to the request's creator (user) based on its waste items
-  acceptRequest(requestId: number): void {
+  // Mark the request as ongoing (if used).
+  startCollection(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
-    if (request && request.status === 'pending') {
+    const currentUser = this.getCurrentUser();
+    if (request && request.status === 'reserved' && request.reservedBy === currentUser?.email) {
+      request.status = 'ongoing';
+      localStorage.setItem(this.requestsKey, JSON.stringify(requests));
+    }
+  }
+
+  // Validate the request: change its status to 'validated' and award points to the request creator.
+  completeCollection(requestId: number): void {
+    const requests = this.getRequests();
+    const request = requests.find(r => r.id === requestId);
+    const currentUser = this.getCurrentUser();
+    // Accept requests that are reserved (or ongoing if needed)
+    if (
+      request &&
+      (request.status === 'reserved' || request.status === 'ongoing') &&
+      request.reservedBy === currentUser?.email
+    ) {
       request.status = 'validated';
       localStorage.setItem(this.requestsKey, JSON.stringify(requests));
       this.awardPoints(request);
     }
   }
 
-  // Reject a pending request: mark its status as "rejected"
+  // Reject a request.
   rejectRequest(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
-    if (request && request.status === 'pending') {
-      request.status = 'rejected';
-      localStorage.setItem(this.requestsKey, JSON.stringify(requests));
+    const currentUser = this.getCurrentUser();
+    if (request) {
+      if (
+        request.status === 'pending' ||
+        ((request.status === 'reserved' || request.status === 'ongoing') &&
+          request.reservedBy === currentUser?.email)
+      ) {
+        request.status = 'rejected';
+        localStorage.setItem(this.requestsKey, JSON.stringify(requests));
+      }
     }
   }
 
   // Award points to the user who created the request.
-  // The points are calculated by iterating over all waste items in the request.
   private awardPoints(request: Request): void {
     let totalPoints = 0;
     if (request.wasteItems && request.wasteItems.length > 0) {
@@ -85,14 +123,13 @@ export class CollectService {
         totalPoints += this.calculatePointsForItem(item.type, item.weight);
       }
     } else if ((request as any).type && (request as any).weight) {
-      // Fallback in case wasteItems is not present at the root level.
       totalPoints = this.calculatePointsForItem((request as any).type, (request as any).weight);
     }
+    // Award points to the creator (whose email is in request.userId)
     this.updateUserScore(request.userId, totalPoints);
   }
 
   // Calculate points for a single waste item.
-  // Weight is in grams; convert to kg and multiply by the corresponding rate.
   private calculatePointsForItem(wasteType: string, weightInGrams: number): number {
     const weightKg = weightInGrams / 1000;
     let pointsPerKg = 0;
@@ -116,26 +153,24 @@ export class CollectService {
     return Math.round(weightKg * pointsPerKg);
   }
 
-  // Retrieve users from local storage. Users must already exist.
+  // Retrieve users from local storage.
   private getUsers(): User[] {
     const stored = localStorage.getItem(this.usersKey);
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Update the user’s score by adding additionalScore.
-  // Also update the currentUser object if it matches the given email.
+  // Update the user's score by adding additionalScore.
   private updateUserScore(email: string, additionalScore: number): void {
     const users = this.getUsers();
     const index = users.findIndex(user => user.email === email);
     if (index !== -1) {
-      // Initialize the score if it doesn't exist
       if (typeof users[index].score !== 'number') {
         users[index].score = 0;
       }
       users[index].score += additionalScore;
       localStorage.setItem(this.usersKey, JSON.stringify(users));
 
-      // Also update currentUser if applicable
+      // If the user being updated is also the current user, update currentUser data.
       const currentUserData = localStorage.getItem(this.currentUserKey);
       if (currentUserData) {
         try {
@@ -153,10 +188,26 @@ export class CollectService {
     }
   }
 
-  // Optional helper to retrieve a user's current score
+  // Optional helper to retrieve a user's current score.
   getUserScore(email: string): number {
     const users = this.getUsers();
     const user = users.find(u => u.email === email);
     return user && typeof user.score === 'number' ? user.score : 0;
+  }
+
+  // Returns requests that are either reserved or validated for the current collector.
+  getMyReservedRequests(): Request[] {
+    const currentUser = this.getCurrentUser();
+    if (!currentUser) {
+      console.log('No current user found.');
+      return [];
+    }
+    const allRequests = this.getRequests();
+    const myReserved = allRequests.filter(request =>
+      ((request.status === 'reserved' || request.status === 'validated') &&
+        request.reservedBy?.trim().toLowerCase() === currentUser.email.trim().toLowerCase())
+    );
+    console.log('My reserved requests:', myReserved);
+    return myReserved;
   }
 }

@@ -1,3 +1,4 @@
+// coupon.service.ts
 import { Injectable } from '@angular/core';
 import { AuthService } from './auth-service.service';
 import { User } from '../models/user.model';
@@ -7,6 +8,7 @@ export interface Coupon {
   requiredPoints: number;
   createdAt: Date;
   userEmail: string;
+  code: string; // unique coupon code
 }
 
 @Injectable({
@@ -20,7 +22,6 @@ export class CouponService {
    */
   getUserScore(): number {
     const user = this.authService.getCurrentUser();
-    // Use 0 as default if score is undefined.
     return user ? (user.score ?? 0) : 0;
   }
 
@@ -57,22 +58,25 @@ export class CouponService {
     if (!currentUser) {
       return null;
     }
-    // Use 0 as default if score is undefined.
     const currentScore = currentUser.score ?? 0;
     if (currentScore < requiredPoints) {
       return null;
     }
 
-    // Deduct the points and update the user's score.
+    // Deduct points and update the user's score.
     const newScore = currentScore - requiredPoints;
     this.updateUserScore(newScore);
+
+    // Generate a unique coupon code (for example: CPN- followed by 8 random alphanumeric characters)
+    const couponCode = 'CPN-' + Math.random().toString(36).substr(2, 8).toUpperCase();
 
     // Create the coupon.
     const coupon: Coupon = {
       value: couponValue,
       requiredPoints,
       createdAt: new Date(),
-      userEmail: currentUser.email
+      userEmail: currentUser.email,
+      code: couponCode
     };
 
     // Retrieve all coupons, add the new coupon, and save them.

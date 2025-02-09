@@ -1,3 +1,4 @@
+// dash1.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import Swal from 'sweetalert2';
@@ -21,7 +22,7 @@ export class DashComponent1 implements OnInit {
     this.loadRequests();
   }
 
-  // Load requests for the current user (collector) from the same city with pending status
+  // Load requests for the current collector
   loadRequests(): void {
     this.requests = this.collectService.getRequestsForCurrentUser();
     console.log('Loaded requests:', this.requests);
@@ -37,18 +38,17 @@ export class DashComponent1 implements OnInit {
     this.selectedRequest = null;
   }
 
-  // Helper: Get the type of the request. If wasteItems exist, show the first type.
-  // In the modal, we will list each waste item separately.
+  // Helper: Get the type of the request.
   getRequestType(request: Request): string {
     if (request.wasteItems && request.wasteItems.length > 0) {
       return request.wasteItems[0].type;
-    } else if ((request as any).type) { // fallback if properties are at root level
+    } else if ((request as any).type) {
       return (request as any).type;
     }
     return 'Unknown';
   }
 
-  // Helper: Get the total weight of the request. If multiple waste items exist, return the sum.
+  // Helper: Get the total weight of the request.
   getRequestWeight(request: Request): number {
     if (request.wasteItems && request.wasteItems.length > 0) {
       return request.wasteItems.reduce((sum, item) => sum + item.weight, 0);
@@ -58,28 +58,51 @@ export class DashComponent1 implements OnInit {
     return 0;
   }
 
-  // Accept the selected request
-  acceptRequest(request: Request): void {
-    // Call the service method to accept the request
-    this.collectService.acceptRequest(request.id);
-    // Show success alert with a message to check collections
+  // Reserve a pending request.
+  reserveRequest(request: Request): void {
+    this.collectService.reserveRequest(request.id);
     Swal.fire({
       icon: 'success',
-      title: 'Request Accepted',
-      text: 'Check your collections.',
+      title: 'Request Reserved',
+      text: 'The request has been reserved. Proceed to collect when ready.',
       timer: 2000,
       showConfirmButton: false
     });
-    // Refresh list and close modal
     this.loadRequests();
     this.closeRequestModal();
   }
 
-  // Reject the selected request
+  // Mark a reserved request as started (ongoing).
+  startCollection(request: Request): void {
+    this.collectService.startCollection(request.id);
+    Swal.fire({
+      icon: 'success',
+      title: 'Collection Started',
+      text: 'You have started the collection.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    this.loadRequests();
+    this.closeRequestModal();
+  }
+
+  // Complete the collection (validate it) and award points.
+  completeCollection(request: Request): void {
+    this.collectService.completeCollection(request.id);
+    Swal.fire({
+      icon: 'success',
+      title: 'Collection Completed',
+      text: 'The collection is complete and the user has been awarded points.',
+      timer: 2000,
+      showConfirmButton: false
+    });
+    this.loadRequests();
+    this.closeRequestModal();
+  }
+
+  // Reject the selected request.
   rejectRequest(request: Request): void {
-    // Call the service method to reject the request
     this.collectService.rejectRequest(request.id);
-    // Show rejection alert
     Swal.fire({
       icon: 'error',
       title: 'Request Rejected',
@@ -87,7 +110,6 @@ export class DashComponent1 implements OnInit {
       timer: 2000,
       showConfirmButton: false
     });
-    // Refresh list and close modal
     this.loadRequests();
     this.closeRequestModal();
   }
