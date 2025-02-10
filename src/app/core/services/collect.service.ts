@@ -13,13 +13,11 @@ export class CollectService {
 
   constructor() {}
 
-  // Retrieve all requests from local storage
   getRequests(): Request[] {
     const stored = localStorage.getItem(this.requestsKey);
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Helper: Get the current logged-in user (collector)
   private getCurrentUser(): User | null {
     const userData = localStorage.getItem(this.currentUserKey);
     if (userData) {
@@ -32,14 +30,12 @@ export class CollectService {
     return null;
   }
 
-  // Get collector's city from the currentUser stored in local storage
   private getCollectorCity(): string {
     const currentUser = this.getCurrentUser();
     return currentUser && currentUser.address ? currentUser.address.trim() : '';
   }
 
-  // Return all requests available to the collector.
-  // Available means pending OR reserved/ongoing (reserved by the current collector)
+
   getRequestsForCurrentUser(): Request[] {
     const collectorCity = this.getCollectorCity().toLowerCase().trim();
     const allRequests = this.getRequests();
@@ -58,7 +54,6 @@ export class CollectService {
     });
   }
 
-  // Reserve a pending request.
   reserveRequest(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
@@ -70,7 +65,6 @@ export class CollectService {
     }
   }
 
-  // Mark the request as ongoing (if used).
   startCollection(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
@@ -81,12 +75,10 @@ export class CollectService {
     }
   }
 
-  // Validate the request: change its status to 'validated' and award points to the request creator.
   completeCollection(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
     const currentUser = this.getCurrentUser();
-    // Accept requests that are reserved (or ongoing if needed)
     if (
       request &&
       (request.status === 'reserved' || request.status === 'ongoing') &&
@@ -98,7 +90,6 @@ export class CollectService {
     }
   }
 
-  // Reject a request.
   rejectRequest(requestId: number): void {
     const requests = this.getRequests();
     const request = requests.find(r => r.id === requestId);
@@ -115,7 +106,6 @@ export class CollectService {
     }
   }
 
-  // Award points to the user who created the request.
   private awardPoints(request: Request): void {
     let totalPoints = 0;
     if (request.wasteItems && request.wasteItems.length > 0) {
@@ -125,11 +115,9 @@ export class CollectService {
     } else if ((request as any).type && (request as any).weight) {
       totalPoints = this.calculatePointsForItem((request as any).type, (request as any).weight);
     }
-    // Award points to the creator (whose email is in request.userId)
     this.updateUserScore(request.userId, totalPoints);
   }
 
-  // Calculate points for a single waste item.
   private calculatePointsForItem(wasteType: string, weightInGrams: number): number {
     const weightKg = weightInGrams / 1000;
     let pointsPerKg = 0;
@@ -153,13 +141,11 @@ export class CollectService {
     return Math.round(weightKg * pointsPerKg);
   }
 
-  // Retrieve users from local storage.
   private getUsers(): User[] {
     const stored = localStorage.getItem(this.usersKey);
     return stored ? JSON.parse(stored) : [];
   }
 
-  // Update the user's score by adding additionalScore.
   private updateUserScore(email: string, additionalScore: number): void {
     const users = this.getUsers();
     const index = users.findIndex(user => user.email === email);
@@ -170,7 +156,6 @@ export class CollectService {
       users[index].score += additionalScore;
       localStorage.setItem(this.usersKey, JSON.stringify(users));
 
-      // If the user being updated is also the current user, update currentUser data.
       const currentUserData = localStorage.getItem(this.currentUserKey);
       if (currentUserData) {
         try {
@@ -188,14 +173,12 @@ export class CollectService {
     }
   }
 
-  // Optional helper to retrieve a user's current score.
   getUserScore(email: string): number {
     const users = this.getUsers();
     const user = users.find(u => u.email === email);
     return user && typeof user.score === 'number' ? user.score : 0;
   }
 
-  // Returns requests that are either reserved or validated for the current collector.
   getMyReservedRequests(): Request[] {
     const currentUser = this.getCurrentUser();
     if (!currentUser) {

@@ -13,8 +13,6 @@ export interface Request {
   date: string;
   timeSlot: string;
   notes?: string;
-  // Update the allowed statuses:
   status: 'pending' | 'reserved' | 'ongoing' | 'validated' | 'rejected';
-  // Optional field to record which collector reserved the request:
   reservedBy?: string;
 }

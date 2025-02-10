@@ -1,13 +1,13 @@
 export interface User {
-  id?: string;                    // Optional
+  id?: string;
   email: string;
   password: string;
   firstName: string;
   lastName: string;
   address: string;
   phone: string;
-  dateOfBirth: string;            // In ISO format (YYYY-MM-DD)
-  profilePicture?: string;        // optional
+  dateOfBirth: string;
+  profilePicture?: string;
   role: 'particulier' | 'collector';
-  score?: number;                 // optional
+  score?: number;
 }

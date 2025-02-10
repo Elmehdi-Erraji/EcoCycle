@@ -17,29 +17,23 @@ import Swal from 'sweetalert2';
 export class DashComponent implements OnInit, OnDestroy {
   // Summary fields
   totalRequests = 0;
-  myScore = 0; // Now read directly from the current user
+  myScore = 0;
 
-  // Current user info
   userId: string = '';
 
-  // All user's requests from the service
   requests: Request[] = [];
 
-  // Search input
+
   searchText = '';
 
-  // Modals
   isAddModalOpen = false;
   isEditModalOpen = false;
   isShowModalOpen = false;
 
-  // For showing or editing a request
   currentRequest: Request | null = null;
 
-  // Subscription to requests
   private subscription!: Subscription;
 
-  // "New Request" form data
   newRequest: Partial<Request> = {
     wasteItems: [],
     photos: [],
@@ -58,15 +52,11 @@ export class DashComponent implements OnInit, OnDestroy {
     const currentUser = this.authService.getCurrentUser();
     if (currentUser) {
       this.userId = currentUser.email;
-      // Directly assign the user's score from the current user object.
       this.myScore = currentUser.score ?? 0;
 
-      // Subscribe to the BehaviorSubject in RequestService
       this.subscription = this.requestService.requests$.subscribe(requests => {
-        // Filter only the requests that belong to the current user
         this.requests = requests.filter(req => req.userId === this.userId);
         this.totalRequests = this.requests.length;
-        // Removed call to calculateScore() since the score is managed elsewhere.
       });
     }
   }
@@ -77,16 +67,12 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  /**
-   * Helper to sum total weight from all wasteItems in a Request.
-   */
+
   getTotalWeight(req: Request): number {
     return req.wasteItems.reduce((sum, item) => sum + item.weight, 0);
   }
 
-  /**
-   * Returns requests filtered by the user's search text.
-   */
+
   get filteredRequests(): Request[] {
     if (!this.searchText) {
       return this.requests;
@@ -99,9 +85,7 @@ export class DashComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ======================================
-  // ADD REQUEST
-  // ======================================
+
   openAddModal(): void {
     this.newRequest = {
       wasteItems: [{ type: '', weight: 1000 }],
@@ -122,7 +106,7 @@ export class DashComponent implements OnInit, OnDestroy {
     if (!this.validateAddForm()) return;
 
     const request: Request = {
-      id: 0, // ID will be assigned by the RequestService
+      id: 0,
       userId: this.userId,
       wasteItems: this.newRequest.wasteItems || [],
       photos: this.newRequest.photos || [],
@@ -160,11 +144,8 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ======================================
-  // EDIT REQUEST
-  // ======================================
+
   openEditModal(req: Request): void {
-    // Create a deep copy of the request to edit.
     this.currentRequest = JSON.parse(JSON.stringify(req));
     this.isEditModalOpen = true;
   }
@@ -197,9 +178,7 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ======================================
-  // SHOW REQUEST
-  // ======================================
+
   openShowModal(req: Request): void {
     this.currentRequest = req;
     this.isShowModalOpen = true;
@@ -209,9 +188,7 @@ export class DashComponent implements OnInit, OnDestroy {
     this.isShowModalOpen = false;
   }
 
-  // ======================================
-  // DELETE REQUEST
-  // ======================================
+
   deleteRequest(req: Request): void {
     Swal.fire({
       title: 'Are you sure?',
@@ -235,9 +212,7 @@ export class DashComponent implements OnInit, OnDestroy {
     });
   }
 
-  // ======================================
-  // FILE UPLOAD (Base64)
-  // ======================================
+
   onFileSelected(event: any): void {
     const files: FileList = event.target.files;
     if (!files) return;
@@ -257,9 +232,7 @@ export class DashComponent implements OnInit, OnDestroy {
     }
   }
 
-  // ======================================
-  // VALIDATION
-  // ======================================
+
   validateAddForm(): boolean {
     if (!this.newRequest.wasteItems || this.newRequest.wasteItems.length === 0) {
       this.showValidationError('Please add at least one waste item.');
