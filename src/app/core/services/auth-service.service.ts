@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { HttpClient } from '@angular/common/http';
 import { Store } from '@ngrx/store';  // Import the Store
 import { User } from '../models/user.model';
-import { refreshUserData } from '../state/auth.actions';
+import { refreshUserData } from '../state/auth/auth.actions';
 
 @Injectable({
   providedIn: 'root'

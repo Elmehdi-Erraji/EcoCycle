@@ -5,8 +5,8 @@ import { Router } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
 
-import * as AuthActions from '../../../core/state/auth.actions';
-import { selectUser, selectAuthLoading, selectAuthError } from '../../../core/state/auth.selectors';
+import * as AuthActions from '../../../core/state/auth/auth.actions';
+import { selectUser, selectAuthLoading, selectAuthError } from '../../../core/state/auth/auth.selectors';
 import { AuthService } from '../../../core/services/auth-service.service';
 
 @Component({
