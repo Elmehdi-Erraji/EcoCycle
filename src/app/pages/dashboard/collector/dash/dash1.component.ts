@@ -22,23 +22,19 @@ export class DashComponent1 implements OnInit {
     this.loadRequests();
   }
 
-  // Load requests for the current collector
   loadRequests(): void {
     this.requests = this.collectService.getRequestsForCurrentUser();
     console.log('Loaded requests:', this.requests);
   }
 
-  // Open the modal and set the selected request
   openRequestModal(request: Request): void {
     this.selectedRequest = request;
   }
 
-  // Close the modal
   closeRequestModal(): void {
     this.selectedRequest = null;
   }
 
-  // Helper: Get the type of the request.
   getRequestType(request: Request): string {
     if (request.wasteItems && request.wasteItems.length > 0) {
       return request.wasteItems[0].type;
@@ -48,7 +44,6 @@ export class DashComponent1 implements OnInit {
     return 'Unknown';
   }
 
-  // Helper: Get the total weight of the request.
   getRequestWeight(request: Request): number {
     if (request.wasteItems && request.wasteItems.length > 0) {
       return request.wasteItems.reduce((sum, item) => sum + item.weight, 0);
@@ -58,7 +53,6 @@ export class DashComponent1 implements OnInit {
     return 0;
   }
 
-  // Reserve a pending request.
   reserveRequest(request: Request): void {
     this.collectService.reserveRequest(request.id);
     Swal.fire({
@@ -72,7 +66,6 @@ export class DashComponent1 implements OnInit {
     this.closeRequestModal();
   }
 
-  // Mark a reserved request as started (ongoing).
   startCollection(request: Request): void {
     this.collectService.startCollection(request.id);
     Swal.fire({
@@ -86,7 +79,6 @@ export class DashComponent1 implements OnInit {
     this.closeRequestModal();
   }
 
-  // Complete the collection (validate it) and award points.
   completeCollection(request: Request): void {
     this.collectService.completeCollection(request.id);
     Swal.fire({
@@ -100,7 +92,6 @@ export class DashComponent1 implements OnInit {
     this.closeRequestModal();
   }
 
-  // Reject the selected request.
   rejectRequest(request: Request): void {
     this.collectService.rejectRequest(request.id);
     Swal.fire({

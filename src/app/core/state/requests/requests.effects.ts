@@ -9,10 +9,9 @@ import { switchMap, map, take } from 'rxjs/operators';
 export class RequestsEffects {
   constructor(
     private actions$: Actions,
-    private requestService: RequestService  // Using your RequestService
+    private requestService: RequestService
   ) {}
 
-  // Effect: Load requests from local storage via the BehaviorSubject
   loadRequests$ = createEffect(() =>
     this.actions$.pipe(
       ofType(RequestsActions.loadRequests),
@@ -25,7 +24,6 @@ export class RequestsEffects {
     )
   );
 
-  // Effect: Add a new request
   addRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(RequestsActions.addRequest),
@@ -41,7 +39,6 @@ export class RequestsEffects {
     )
   );
 
-  // Effect: Update (edit) an existing request
   updateRequest$ = createEffect(() =>
     this.actions$.pipe(
       ofType(RequestsActions.updateRequest),
@@ -55,27 +52,18 @@ export class RequestsEffects {
     )
   );
 
-  // Effect: Update a request's status (for reserve, complete/validate, reject, or start)
   updateRequestStatus$ = createEffect(() =>
     this.actions$.pipe(
       ofType(RequestsActions.updateRequestStatus),
       switchMap(action => {
-        // Here, we assume your RequestService already handles status updates internally.
-        // For example, if you had implemented reserveRequest, completeCollection, etc.,
-        // you would call them here. For now, we assume that the service
-        // internally updates the state when these actions are called.
+
         if (action.status === 'reserved') {
-          // Example: this.requestService.reserveRequest(action.requestId);
-          // (Ensure such a method exists in your service if needed.)
+
         } else if (action.status === 'validated') {
-          // Example: this.requestService.completeCollection(action.requestId);
         } else if (action.status === 'rejected') {
-          // Example: this.requestService.rejectRequest(action.requestId);
         } else if (action.status === 'ongoing') {
-          // Example: this.requestService.startCollection(action.requestId);
         }
-        // In our simplified example, we assume the above methods are implemented
-        // and update the BehaviorSubject. Then we retrieve the updated list:
+
         return this.requestService.requests$.pipe(
           take(1),
           map(requests => RequestsActions.updateRequestStatusSuccess({ requests }))

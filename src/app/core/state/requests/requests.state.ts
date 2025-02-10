@@ -6,5 +6,5 @@ export interface RequestsState {
 }
 
 export const initialRequestsState: RequestsState = {
-  requests: [] // Initially empty; will be loaded from local storage by an effect.
+  requests: []
 };

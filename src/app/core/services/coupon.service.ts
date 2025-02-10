@@ -8,7 +8,7 @@ export interface Coupon {
   requiredPoints: number;
   createdAt: Date;
   userEmail: string;
-  code: string; // unique coupon code
+  code: string;
 }
 
 @Injectable({
@@ -17,29 +17,22 @@ export interface Coupon {
 export class CouponService {
   constructor(private authService: AuthService) {}
 
-  /**
-   * Retrieves the current user's score.
-   */
+
   getUserScore(): number {
     const user = this.authService.getCurrentUser();
     return user ? (user.score ?? 0) : 0;
   }
 
-  /**
-   * Updates the current user's score in local storage.
-   */
+
   private updateUserScore(newScore: number): void {
     const user: User | null = this.authService.getCurrentUser();
     if (user) {
       user.score = newScore;
       localStorage.setItem('currentUser', JSON.stringify(user));
-      // Optionally, update the users array if required.
     }
   }
 
-  /**
-   * Retrieves all coupons associated with the current user.
-   */
+
   getCoupons(): Coupon[] {
     const allCoupons: Coupon[] = JSON.parse(localStorage.getItem('coupons') || '[]');
     const currentUser = this.authService.getCurrentUser();
@@ -49,10 +42,7 @@ export class CouponService {
     return allCoupons.filter(coupon => coupon.userEmail === currentUser.email);
   }
 
-  /**
-   * Creates a coupon if the current user has enough points.
-   * Deducts the required points and saves the coupon.
-   */
+
   createCoupon(requiredPoints: number, couponValue: number): Coupon | null {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
@@ -63,14 +53,11 @@ export class CouponService {
       return null;
     }
 
-    // Deduct points and update the user's score.
     const newScore = currentScore - requiredPoints;
     this.updateUserScore(newScore);
 
-    // Generate a unique coupon code (for example: CPN- followed by 8 random alphanumeric characters)
     const couponCode = 'CPN-' + Math.random().toString(36).substr(2, 8).toUpperCase();
 
-    // Create the coupon.
     const coupon: Coupon = {
       value: couponValue,
       requiredPoints,
@@ -79,7 +66,6 @@ export class CouponService {
       code: couponCode
     };
 
-    // Retrieve all coupons, add the new coupon, and save them.
     const allCoupons: Coupon[] = JSON.parse(localStorage.getItem('coupons') || '[]');
     allCoupons.push(coupon);
     localStorage.setItem('coupons', JSON.stringify(allCoupons));

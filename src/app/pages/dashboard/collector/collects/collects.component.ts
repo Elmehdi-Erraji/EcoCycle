@@ -31,31 +31,26 @@ export class CollectsComponent implements OnInit {
     this.reservedRequests = this.collectService.getMyReservedRequests();
   }
 
-  // Helper: Get the type of a request.
   getRequestType(request: Request): string {
     return request.wasteItems && request.wasteItems.length > 0
       ? request.wasteItems[0].type
       : 'Unknown';
   }
 
-  // Helper: Get the total weight of a request.
   getRequestWeight(request: Request): number {
     return request.wasteItems && request.wasteItems.length > 0
       ? request.wasteItems.reduce((sum, item) => sum + item.weight, 0)
       : 0;
   }
 
-  // Open the modal and set the selected request.
   openRequestModal(request: Request): void {
     this.selectedRequest = request;
   }
 
-  // Close the modal.
   closeRequestModal(): void {
     this.selectedRequest = null;
   }
 
-  // Action: Validate (complete) the reserved request.
   completeCollection(request: Request): void {
     this.collectService.completeCollection(request.id);
     Swal.fire({
@@ -69,7 +64,6 @@ export class CollectsComponent implements OnInit {
     this.closeRequestModal();
   }
 
-  // Action: Reject the reserved request.
   rejectRequest(request: Request): void {
     this.collectService.rejectRequest(request.id);
     Swal.fire({

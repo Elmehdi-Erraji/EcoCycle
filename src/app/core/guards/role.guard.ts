@@ -13,17 +13,16 @@ export class RoleGuard implements CanActivate {
     const currentUser: User | null = this.authService.getCurrentUser();
 
     if (!currentUser) {
-      this.authService.logout(); // Logout user if no valid session exists
+      this.authService.logout();
       this.router.navigate(['/login']);
       return false;
     }
 
-    // Get allowed roles from route data
     const requiredRoles = route.data['roles'] as string[];
 
     if (requiredRoles && !requiredRoles.includes(currentUser.role)) {
-      this.authService.logout(); // Logout user on unauthorized access
-      this.router.navigate(['/login']); // Redirect to login page
+      this.authService.logout();
+      this.router.navigate(['/login']);
       return false;
     }
 
